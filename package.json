@@ -1,0 +1,74 @@
+{
+  "name": "huomiantong",
+  "version": "0.1.0",
+  "description": "获面通 - 个人简历驱动的实时模拟面试回答助手",
+  "private": true,
+  "author": "kangg",
+  "main": "out/main/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "docs:index": "node scripts/generate-help-doc-index.mjs",
+    "docs:index:check": "node scripts/generate-help-doc-index.mjs --check",
+    "prebuild": "npm run docs:index",
+    "build": "tsc --noEmit && electron-vite build",
+    "start": "electron-vite preview",
+    "dist": "npm run build && electron-builder",
+    "dist:publish": "npm run build && electron-builder --publish always"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "electron-updater": "^6.8.9",
+    "electron-vite": "^4.0.0",
+    "lucide-react": "^0.468.0",
+    "mammoth": "^1.12.0",
+    "pdfjs-dist": "^6.1.200",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  },
+  "build": {
+    "appId": "com.huomiantong.desktop",
+    "productName": "获面通",
+    "directories": {
+      "output": "release"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "ckang2927-commits",
+        "repo": "huomiantong-app",
+        "releaseType": "release"
+      }
+    ],
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "docs",
+        "to": "docs",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
