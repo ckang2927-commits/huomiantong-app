@@ -792,7 +792,7 @@ P1-4 隐私模式 ──────────── 完全独立，随时可�
 | 17 | P3-17 | 长录音优化 | 🟡 第一版完成，待长录音复测 | 对 20-60 分钟录音给出分段、发言人校正、失败重试和问题提取建议 | `interviewReviewService.ts`、`InterviewReviewView.tsx` | 实际约 0.8h；真实长录音复测另需 1-2h | ★★★★★ | Deepgram 文件转写超时改成动态 3-10 分钟；底部“长录音优化”生成本地建议；待 20/60 分钟录音复测 |
 | 18 | P3-18 | 复盘增强结果预览下载 | ✅ 已完成 | AI 深度报告、AI 深度话术、长录音建议不再只显示文本框，先展示报告预览，再决定复制或下载 | `InterviewReviewView.tsx`、`styles.css` | 实际约 0.6h | ★★★★★ | 三个增强卡片都有清楚说明；生成前有预览占位；生成后显示卡片式预览；支持复制、下载 MD、下载 Word；`npm run build` 通过 |
 | 19 | P3-19 | 按题型质量评分优化 | ✅ 已完成 | 先判断问题类型，再判断回答质量；HR/意愿/地点/时间类问题不再按业务指标扣分 | `questionIntent.ts`、`interviewReviewAnalyzer.ts`、`interviewReviewReport.ts`、`InterviewReviewView.tsx` | 实际约 0.7h；真实录音回归另需 0.5h | ★★★★★ | “家里人支持吗/自己有意愿吗”识别为意愿稳定；评分看态度、原因和安排；项目/成果题才提示业务指标；UI 指标显示“准确/可信/证据” |
-| 20 | P3-20 | 软件更新入口与 GitHub 更新源 | 🟡 代码已接入，待仓库/Release 实测 | 设置中心增加“检查更新/发布说明/重启安装”入口；正式安装包启动后自动检查 GitHub Releases | `updateService.ts`、`AboutDiagnosticsPanel.tsx`、`preload/index.ts`、`package.json build.publish`、GitHub Releases | 已完成约 2h；真实上传仓库 + Release 验收另需 1-3h | ★★★★★ | 开发模式会明确提示不检查更新；正式包会自动检查；下载完成后可重启安装；待创建/确认 `ckang2927-commits/huomiantong-app` 仓库并发布 `latest.yml` 后实测 |
+| 20 | P3-20 | 软件更新入口与 GitHub 更新源 | 🟡 GitHub Actions 已接入，待 Release 跑完和更新实测 | 设置中心增加“检查更新/发布说明/重启安装”入口；正式安装包启动后自动检查 GitHub Releases；推送 `v*` 标签自动发布安装包 | `updateService.ts`、`AboutDiagnosticsPanel.tsx`、`preload/index.ts`、`package.json build.publish`、`.github/workflows/release.yml` | 已完成约 3h；等待 GitHub Actions + 自动更新验收另需 1-2h | ★★★★★ | 开发模式会明确提示不检查更新；正式包会自动检查；下载完成后可重启安装；下一步用本机已安装的 0.1.0 验证更新到 0.1.1 |
 
 ### B. P3-14 面试复盘模块详细拆分
 
@@ -815,7 +815,7 @@ P1-4 隐私模式 ──────────── 完全独立，随时可�
 | P3-17 长录音优化 | 🟡 第一版完成，待长录音复测 | 对 20-60 分钟录音给出分段、重试、发言人校正和长录音模式建议 | `src/main/services/interviewReviewService.ts`、`InterviewReviewView.tsx`、`docs/manual-test-interview-review.md` | 需要处理超时、说话人交叉、长文本压力和 UI 卡顿；不能只给空建议 | 实际约 0.8h；真实长录音复测另需 1-2h | 转写超时提示更明确；长录音建议卡可生成分段、发言人校正和失败重试方案 |
 | P3-18 复盘增强结果预览下载 | ✅ 已完成 | 给 AI 深度报告、AI 深度话术、长录音优化建议增加“先预览再下载”的产品体验 | `InterviewReviewView.tsx`、`styles.css` | 预览不能吞掉完整内容；下载文件要保留完整 Markdown；按钮不能拥挤 | 实际约 0.6h | 生成前显示预览占位；生成后卡片化显示前 12 行；复制、MD、Word 下载均可用；构建通过 |
 | P3-19 按题型质量评分优化 | ✅ 已完成 | 不同题型用不同评分标准：短事实题看准确直接，HR 意愿题看态度和稳定安排，项目题才看业务证据 | `questionIntent.ts`、`interviewReviewAnalyzer.ts`、`interviewReviewReport.ts` | 不能把所有通用问题都当项目题；也不能让项目题丢掉指标要求 | 实际约 0.7h；真实录音回归另需 0.5h | 家庭支持/个人意愿类问题不再提示“缺业务指标”；整场报告薄弱点文案同步改为“业务证据/回答可信度”分开 |
-| P3-20 软件更新入口与 GitHub 更新源 | 🟡 代码已接入，待仓库/Release 实测 | 在设置中心放“检查更新/重启安装”，正式安装包启动后自动检查 GitHub Releases | `src/main/services/updateService.ts`、`src/main/index.ts`、`src/preload/index.ts`、`AboutDiagnosticsPanel.tsx`、`electron-updater`、`package.json build.publish` | GitHub Dashboard 不是仓库地址；公开仓库不能包含 API Key、简历、录音；真实更新必须由 `electron-builder` 生成并上传 `latest.yml` | 已完成约 2h；创建仓库/首个 Release/覆盖安装验收另需 1-3h | 开发模式显示“不连接自动更新”；正式包启动自动检查；发现新版本自动下载，下载完成后可重启安装 |
+| P3-20 软件更新入口与 GitHub 更新源 | 🟡 GitHub Actions 已接入，待 Release 跑完和更新实测 | 在设置中心放“检查更新/重启安装”，正式安装包启动后自动检查 GitHub Releases；推送标签自动打包并发布 Release | `src/main/services/updateService.ts`、`src/main/index.ts`、`src/preload/index.ts`、`AboutDiagnosticsPanel.tsx`、`electron-updater`、`package.json build.publish`、`.github/workflows/release.yml` | 公开仓库不能包含 API Key、简历、录音；真实更新必须由 Release 中的安装包、blockmap、`latest.yml` 一致支撑；未签名安装包会提示未知发布者 | 已完成约 3h；GitHub Actions 发布和覆盖安装验收另需 1-2h | 本地 0.1.0 安装包已验证可安装启动；下一步发布 0.1.1，用 0.1.0 设置中心检查更新 |
 
 ### C. 打包后一定会变化的点
 

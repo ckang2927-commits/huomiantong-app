@@ -8,6 +8,7 @@
 - 设置中心已有「检查更新」「发布说明」「重启安装」入口。
 - 正式安装包启动后会自动检查更新；开发模式不会连更新源。
 - 当前默认发布源配置为：`ckang2927-commits/huomiantong-app`。
+- 已接入 GitHub Actions 自动发布：推送 `v*` 标签后会自动打 Windows 安装包并发布 Release。
 
 ## 重要边界
 
@@ -22,18 +23,18 @@
 2. 确认远程地址类似：`https://github.com/ckang2927-commits/huomiantong-app.git`。
 3. 本地执行敏感文件检查，确认没有真实 Key、简历、录音进入 Git。
 4. 更新 `package.json` 的 `version`，例如从 `0.1.0` 改为 `0.1.1`。
-5. 执行 `npm run dist`，确认 `release/` 目录生成安装包和 `latest.yml`。
-6. 在 GitHub Releases 创建版本，例如 `v0.1.1`。
-7. 上传 `release/` 里的安装包、blockmap 和 `latest.yml`。
+5. 提交并推送代码到 `main`。
+6. 创建并推送版本标签，例如 `v0.1.1`。
+7. GitHub Actions 会自动执行 `npm run dist:publish`，生成安装包、blockmap 和 `latest.yml`。
 8. 已安装旧版本的用户启动 App，或在设置中心点击「检查更新」。
 
 ## 后续每次更新流程
 
 1. 修改功能并完成 `npm run build`。
 2. 修改 `package.json` 版本号，版本号必须高于线上版本。
-3. 执行 `npm run dist` 生成新安装包。
-4. 创建新的 GitHub Release，例如 `v0.1.2`。
-5. 上传新的安装包和 `latest.yml`。
+3. 提交并推送到 `main`。
+4. 创建新的 GitHub tag，例如 `v0.1.2`。
+5. 等 GitHub Actions 自动生成 Release。
 6. 在旧版本 App 里点击「检查更新」验收。
 
 ## 验收清单
