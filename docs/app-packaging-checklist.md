@@ -90,4 +90,15 @@
 | 安装包大小 | |
 | 已知问题 | |
 
+## 2026-07-30 第一轮打包验收记录
+
+- `npm run dist` 已通过，生成 `release/huomiantong-setup-0.1.0.exe`、blockmap 和 `latest.yml`。
+- 测试安装目录：`%LOCALAPPDATA%/Programs/huomiantong-test/`。
+- 安装包静默安装成功，安装版主窗口可启动。
+- `resources/docs` 已进入安装目录，共检查到 104 个文档资源。
+- GitHub Actions 已发布 `v0.1.1`，Release 附件包含安装包、blockmap、`latest.yml`。
+- 已安装的 `0.1.0` 能自动下载 `0.1.1` 到 `%LOCALAPPDATA%/huomiantong-updater/pending/`。
+- 使用下载到的 `0.1.1` 更新包覆盖安装成功，安装目录 `app.asar/package.json` 确认为 `0.1.1`，更新后可启动。
+- 待补验收：设置页「重启安装」按钮人工点击、真实 API Key 保存读取、麦克风/电脑音频真测、任务栏/安装器图标、代码签名。
+
 > 完成以上检查后，可参考 `docs/packaged-app-regression.md` 做打包后人工验收。
