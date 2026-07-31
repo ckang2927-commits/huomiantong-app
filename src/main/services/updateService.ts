@@ -1,7 +1,9 @@
 import { app } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import electronUpdater from 'electron-updater'
 import type { ProgressInfo, UpdateInfo } from 'electron-updater'
 import type { AppUpdateStatus } from '../../shared/types'
+
+const { autoUpdater } = electronUpdater
 
 type UpdateStatusSender = (status: AppUpdateStatus) => void
 
