@@ -73,6 +73,7 @@ const api = {
   restartApp: (): Promise<{ mode: 'reload' | 'relaunch' }> => ipcRenderer.invoke('app:restart'),
   getUpdateStatus: (): Promise<AppUpdateStatus> => ipcRenderer.invoke('app:update-status'),
   checkForUpdates: (): Promise<AppUpdateStatus> => ipcRenderer.invoke('app:update-check'),
+  downloadUpdate: (): Promise<AppUpdateStatus> => ipcRenderer.invoke('app:update-download'),
   installUpdate: (): Promise<AppUpdateStatus> => ipcRenderer.invoke('app:update-install'),
   // 启动流式回答
   startStreamingAnswer: (request: AnswerRequest): void => {

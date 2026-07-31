@@ -9,6 +9,7 @@ let eventRegistered = false
 let sender: UpdateStatusSender | null = null
 let lastStatus: AppUpdateStatus = {
   state: 'idle',
+  version: app.getVersion(),
   message: '尚未检查更新。正式安装包启动后会自动检查 GitHub Releases。'
 }
 
@@ -56,7 +57,7 @@ export function registerAutoUpdateEvents(sendStatus: UpdateStatusSender): void {
   }
 
   eventRegistered = true
-  autoUpdater.autoDownload = true
+  autoUpdater.autoDownload = false
   autoUpdater.autoInstallOnAppQuit = true
 
   autoUpdater.on('checking-for-update', () => {
@@ -71,7 +72,7 @@ export function registerAutoUpdateEvents(sendStatus: UpdateStatusSender): void {
     emitUpdateStatus({
       state: 'available',
       version: getVersion(info),
-      message: `发现新版本 v${getVersion(info)}，正在后台下载更新包...`
+      message: `发现新版本 v${getVersion(info)}。请确认后再下载更新包。`
     })
   })
 
@@ -126,6 +127,37 @@ export async function checkForUpdatesManually(): Promise<AppUpdateStatus> {
       message: '正在检查新版本...'
     })
     await autoUpdater.checkForUpdates()
+    return lastStatus
+  } catch (error) {
+    return emitUpdateStatus({
+      state: 'error',
+      version: app.getVersion(),
+      message: describeUpdateError(error)
+    })
+  }
+}
+
+export async function downloadAvailableUpdate(): Promise<AppUpdateStatus> {
+  if (!app.isPackaged) {
+    return emitUpdateStatus(getDevelopmentStatus())
+  }
+
+  if (lastStatus.state !== 'available') {
+    return emitUpdateStatus({
+      state: 'error',
+      version: app.getVersion(),
+      message: '当前没有待下载的更新，请先点击“检查更新”。'
+    })
+  }
+
+  try {
+    emitUpdateStatus({
+      state: 'downloading',
+      version: lastStatus.version,
+      percent: 0,
+      message: '正在下载更新包：0.0%'
+    })
+    await autoUpdater.downloadUpdate()
     return lastStatus
   } catch (error) {
     return emitUpdateStatus({

@@ -70,11 +70,29 @@ export function AboutDiagnosticsPanel(): JSX.Element {
     }
   }
 
+  const handleDownloadUpdate = async (): Promise<void> => {
+    try {
+      setUpdateStatus({
+        state: 'downloading',
+        version: updateStatus.version,
+        percent: 0,
+        message: '正在准备下载更新包：0.0%'
+      })
+      setUpdateStatus(await window.huomiantong.downloadUpdate())
+    } catch (error) {
+      setUpdateStatus({
+        state: 'error',
+        message: error instanceof Error ? error.message : '下载更新失败'
+      })
+    }
+  }
+
   const handleOpenReleaseNotes = async (): Promise<void> => {
-    const result = await window.huomiantong.openDoc('docs/release-notes-template.md')
+    const result = await window.huomiantong.openDoc('docs/release-notes-v0.1.3.md')
     setUpdateStatus({
       state: result.ok ? 'idle' : 'error',
-      message: result.ok ? '已打开版本发布说明模板。' : result.message || '打开发布说明失败。'
+      version: updateStatus.version,
+      message: result.ok ? '已打开 v0.1.3 更新说明。' : result.message || '打开更新说明失败。'
     })
   }
 
@@ -98,8 +116,8 @@ export function AboutDiagnosticsPanel(): JSX.Element {
           <Info size={18} />
           <div>
             <strong>版本信息</strong>
-            <p>获面通 v0.1.0（开发版）</p>
-            <span className="about-note">正式版本号以打包构建时为准。</span>
+            <p>获面通 v0.1.3</p>
+            <span className="about-note">当前版本已修复安装启动和更新下载流程。</span>
           </div>
         </div>
 
@@ -113,6 +131,12 @@ export function AboutDiagnosticsPanel(): JSX.Element {
                 <RefreshCw size={14} />
                 检查更新
               </button>
+              {updateStatus.state === 'available' && (
+                <button className="primary-button compact" type="button" onClick={() => void handleDownloadUpdate()}>
+                  <Download size={14} />
+                  下载更新
+                </button>
+              )}
               {updateStatus.state === 'downloaded' && (
                 <button className="primary-button compact" type="button" onClick={() => void handleInstallUpdate()}>
                   <Download size={14} />
@@ -129,7 +153,10 @@ export function AboutDiagnosticsPanel(): JSX.Element {
                 <span style={{ width: `${updateStatus.percent}%` }} />
               </div>
             )}
-            <span className={`about-note about-update-status status-${updateStatus.state}`}>{updateStatus.message}</span>
+            <span className={`about-note about-update-status status-${updateStatus.state}`}>
+              {updateStatus.message}
+              {updateStatus.state === 'available' && ' 下载前会先征求你的同意。'}
+            </span>
           </div>
         </div>
 

@@ -25,6 +25,7 @@ import { generateTrainingTurn } from './services/trainingService'
 import {
   checkForUpdatesManually,
   checkForUpdatesOnStartup,
+  downloadAvailableUpdate,
   getCurrentUpdateStatus,
   installDownloadedUpdate,
   registerAutoUpdateEvents
@@ -121,6 +122,7 @@ app.whenReady().then(() => {
   ipcMain.handle('docs:open', (_event, docPath: string) => openDocFile(docPath))
   ipcMain.handle('app:update-status', getCurrentUpdateStatus)
   ipcMain.handle('app:update-check', checkForUpdatesManually)
+  ipcMain.handle('app:update-download', downloadAvailableUpdate)
   ipcMain.handle('app:update-install', installDownloadedUpdate)
   ipcMain.handle('app:restart', () => {
     if (!app.isPackaged) {

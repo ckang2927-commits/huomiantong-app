@@ -29,7 +29,7 @@ const DOC_GROUPS = [
   {
     label: "质量与发布",
     links: [
-      { icon: FileText, title: "v0.1.2 更新说明", desc: "查看本次新增、优化和升级方式", path: "docs/release-notes-v0.1.2.md" },
+      { icon: FileText, title: "v0.1.3 更新说明", desc: "查看本次修复、优化和升级方式", path: "docs/release-notes-v0.1.3.md" },
       { icon: ClipboardCheck, title: "发布前检查表", desc: "给朋友使用前逐项检查", path: "docs/deepseek-phase1-docs.md（第四部分）" },
       { icon: ListChecks, title: "回归测试清单", desc: "每次修改后逐模块点测", path: "docs/regression-checklist.md" },
       { icon: FileText, title: "产品说明与隐私", desc: "版本、数据存储、隐私说明", path: "docs/product-info.md" },
