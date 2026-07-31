@@ -9292,6 +9292,35 @@ body.floating-resizing {
   backdrop-filter: blur(2px);
 }
 
+.onboarding-resume-bar {
+  position: fixed;
+  z-index: 1101;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(520px, calc(100vw - 40px));
+  padding: 10px 12px;
+  border: 1px solid #b8d9c8;
+  border-radius: 10px;
+  background: #fffdf8;
+  color: #2a4a40;
+  box-shadow: 0 10px 28px rgba(31, 43, 39, 0.18);
+  font-size: 13px;
+}
+
+.onboarding-resume-bar > svg {
+  flex: 0 0 auto;
+  color: #267d71;
+}
+
+.onboarding-resume-bar span {
+  min-width: 0;
+  flex: 1;
+  line-height: 1.4;
+}
+
 .onboarding-card {
   position: relative;
   width: min(620px, 100%);
@@ -9505,6 +9534,13 @@ body.floating-resizing {
 
   .onboarding-actions {
     flex-direction: column-reverse;
+  }
+
+  .onboarding-resume-bar {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    max-width: none;
   }
 }
 

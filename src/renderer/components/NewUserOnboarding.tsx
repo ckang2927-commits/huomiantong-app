@@ -136,6 +136,7 @@ export function startNewUserOnboarding(): void {
 
 export function NewUserOnboarding(): JSX.Element | null {
   const [open, setOpen] = useState(false)
+  const [paused, setPaused] = useState(false)
   const [mode, setMode] = useState<'formal' | 'preview' | null>(null)
   const [stepIndex, setStepIndex] = useState(0)
   const setActiveView = useUIStore((state) => state.setActiveView)
@@ -151,6 +152,7 @@ export function NewUserOnboarding(): JSX.Element | null {
     const handleStart = (): void => {
       setMode(null)
       setStepIndex(0)
+      setPaused(false)
       setOpen(true)
     }
 
@@ -163,33 +165,55 @@ export function NewUserOnboarding(): JSX.Element | null {
 
   const close = (): void => {
     localStorage.setItem(ONBOARDING_DONE_KEY, 'true')
+    setPaused(false)
     setOpen(false)
   }
 
   const startMode = (nextMode: 'formal' | 'preview'): void => {
     setMode(nextMode)
     setStepIndex(0)
+    setPaused(false)
   }
 
-  const goTarget = (): void => {
+  const goTarget = (pauseAfterNavigation = true): void => {
     if (!step?.targetView) return
 
     setActiveView(step.targetView)
     openSettingsSection(step.settingsSection)
+    if (pauseAfterNavigation) {
+      setOpen(false)
+      setPaused(true)
+    }
+  }
+
+  const resume = (): void => {
+    setPaused(false)
+    setOpen(true)
   }
 
   const next = (): void => {
     if (stepIndex >= steps.length - 1) {
       close()
-      goTarget()
+      goTarget(false)
       return
     }
 
     setStepIndex((current) => current + 1)
   }
 
-  if (!open) {
-    return null
+  if (!open && !paused) return null
+
+  if (!open && paused) {
+    return (
+      <div className="onboarding-resume-bar" role="status">
+        <Sparkles size={16} />
+        <span>新手引导已暂存，完成当前操作后可以继续。</span>
+        <button className="primary-button compact" type="button" onClick={resume}>继续引导</button>
+        <button className="icon-button" type="button" aria-label="结束新手引导" title="结束引导" onClick={close}>
+          <X size={16} />
+        </button>
+      </div>
+    )
   }
 
   if (!mode) {
@@ -280,7 +304,7 @@ export function NewUserOnboarding(): JSX.Element | null {
         )}
 
         {step.primaryLabel && (
-          <button className="onboarding-focus-button" type="button" onClick={goTarget}>
+          <button className="onboarding-focus-button" type="button" onClick={() => goTarget()}>
             {step.primaryLabel}
             <ArrowRight size={16} />
           </button>
