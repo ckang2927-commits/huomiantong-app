@@ -10,6 +10,7 @@ export type TrainingDraftPayload = {
   trainingMode: TrainingMode
   roundCount: TrainingQuestionCount
   questionOutline: string[]
+  questionFocus: string[]
   rounds: TrainingRound[]
   currentAnswer: string
   finalReport: string
@@ -55,6 +56,7 @@ export function loadTrainingDraft(): TrainingDraftPayload | null {
       trainingMode: draft.trainingMode,
       roundCount: draft.roundCount,
       questionOutline: Array.isArray(draft.questionOutline) ? draft.questionOutline.map((question) => String(question).trim()).filter(Boolean).slice(0, 20) : [],
+      questionFocus: Array.isArray(draft.questionFocus) ? draft.questionFocus.map((item) => String(item).trim()).filter(Boolean).slice(0, 12) : [],
       rounds: draft.rounds,
       currentAnswer: draft.currentAnswer || '',
       finalReport: draft.finalReport || '',

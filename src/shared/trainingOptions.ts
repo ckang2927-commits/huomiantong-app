@@ -13,18 +13,11 @@ export const trainingPresetOptions: TrainingPreset[] = [
     id: 'data-analyst-20',
     label: '数据分析 20 题',
     roleLabel: '数据分析岗',
-    hint: '从业务指标到 SQL、建模、实验和结论落地，一站式练习数据分析全流程。',
+    hint: '从业务指标到 SQL、建模、实验和结论落地，题目由内置 500 题库动态抽取。',
     interviewMode: 'dataAnalyst',
     trainingMode: 'comprehensive',
     roundCount: 20,
     focus: ['指标体系', 'SQL/取数', '建模分析', 'A/B 实验', '业务结论'],
-    questionOutline: [
-      '请先做一个 1 分钟自我介绍，重点突出你和数据分析岗位最匹配的经历。',
-      '讲一个你做过的数据分析项目：业务背景、问题定义、数据来源和最终结论分别是什么？',
-      '如果让你为一个新业务搭指标体系，你会怎么拆北极星指标、过程指标和护栏指标？',
-      '讲一次你用 SQL 或数据清洗定位问题的经历，难点在哪里？',
-      '你有没有做过建模、预测、分类、聚类或评分卡相关工作？请讲清楚建模目标、特征、评估指标和落地方式。'
-    ]
   },
   {
     id: 'ai-pm-20',

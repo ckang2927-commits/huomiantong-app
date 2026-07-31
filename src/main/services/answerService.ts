@@ -148,7 +148,17 @@ export async function streamAnswer(
       // 评分结果可以通过单独的 IPC 事件发送，这里先忽略，后续可扩展
     }
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : '未知错误'
+    const errorMsg = formatAnswerServiceError(error)
     onChunk({ text: '', done: true, error: errorMsg, provider, latencyMs: Date.now() - startedAt })
   }
+}
+
+function formatAnswerServiceError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error || '未知错误')
+
+  if (/timeout|timed out|aborted due to timeout|abort/i.test(message)) {
+    return '模型响应超时：请检查网络、模型名、余额，或切换更快的模型后重试。'
+  }
+
+  return message
 }

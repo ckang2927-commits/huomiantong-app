@@ -82,6 +82,7 @@ export function useAnswerGeneration({
       candidateName: maskSessionText(snapshot.candidateName || settingsRef.current.resume.candidateName || '未选择候选人', snapshot, privacyMode),
       targetRole: snapshot.targetRole || settingsRef.current.resume.targetRole || '未设置岗位',
       queuedCount: queueRef.current.length,
+      privacyMode,
       records: buildFloatingRecords(snapshot, privacyMode)
     })
   }
@@ -240,7 +241,7 @@ export function useAnswerGeneration({
         }))
 
         if (streamError) {
-          const errorAnswer = `模型生成失败：${streamError}`
+          const errorAnswer = formatGenerationError(streamError)
           setCompleted({
             answer: errorAnswer,
             provider: chunk.provider ?? settingsRef.current.answer.llmProvider,
@@ -388,4 +389,26 @@ export function useAnswerGeneration({
     contextCompressionNotice,
     questionIntent
   }
+}
+
+function formatGenerationError(message: string): string {
+  const normalized = message.trim()
+
+  if (/timeout|timed out|aborted due to timeout|abort/i.test(normalized)) {
+    return '模型响应超时了，已保留当前问题，未把错误写成正式答案。请先检查网络、模型名和余额，或切到更快的模型后重试。'
+  }
+
+  if (/401|unauthorized|api key/i.test(normalized)) {
+    return '模型调用失败：API Key 可能无效或没有权限。请到设置中心重新保存 Key 后再试。'
+  }
+
+  if (/402|payment|quota|余额|额度/i.test(normalized)) {
+    return '模型调用失败：当前账号额度或余额可能不足。请到服务商后台确认后再试。'
+  }
+
+  if (/404|model|not found/i.test(normalized)) {
+    return '模型调用失败：模型名称或 Base URL 可能填错。请到设置中心检查当前模型配置。'
+  }
+
+  return `模型调用失败：${normalized || '未知错误'}`
 }

@@ -8,6 +8,7 @@ export interface MockInterviewConfig {
   difficulty: MockInterviewDifficulty
   focus: string[]
   interviewerStyle: MockInterviewerStyle
+  interviewerVoiceURI: string
   questionStrategy: MockQuestionStrategy
 }
 
@@ -19,6 +20,7 @@ export const defaultMockInterviewConfig: MockInterviewConfig = {
   difficulty: 'medium',
   focus: ['项目深挖', '简历真实性'],
   interviewerStyle: 'random',
+  interviewerVoiceURI: '',
   questionStrategy: 'mixed'
 }
 
@@ -35,6 +37,7 @@ export function normalizeMockInterviewConfig(value: Partial<MockInterviewConfig>
     difficulty: isDifficulty(value?.difficulty) ? value.difficulty : defaultMockInterviewConfig.difficulty,
     focus: focus.length > 0 ? focus : defaultMockInterviewConfig.focus,
     interviewerStyle: isInterviewerStyle(value?.interviewerStyle) ? value.interviewerStyle : defaultMockInterviewConfig.interviewerStyle,
+    interviewerVoiceURI: typeof value?.interviewerVoiceURI === 'string' ? value.interviewerVoiceURI.trim().slice(0, 240) : defaultMockInterviewConfig.interviewerVoiceURI,
     questionStrategy: isQuestionStrategy(value?.questionStrategy) ? value.questionStrategy : defaultMockInterviewConfig.questionStrategy
   }
 }

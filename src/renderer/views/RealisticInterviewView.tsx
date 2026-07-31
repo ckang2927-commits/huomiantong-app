@@ -1,4 +1,4 @@
-import { Brain, Clock3, FileText, Loader2, Mic, PlayCircle, RotateCcw, Save, SendHorizontal, Square, UserRoundCheck, Volume2 } from 'lucide-react'
+import { Brain, ChevronDown, ChevronUp, Clock3, FileText, Loader2, Mic, PlayCircle, RotateCcw, Save, SendHorizontal, Square, UserRoundCheck, Volume2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { MockInterviewConfigPanel, getDefaultMockInterviewConfig } from '../components/training/MockInterviewConfigPanel'
 import { MockInterviewFlowPreview } from '../components/training/MockInterviewFlowPreview'
@@ -73,8 +73,9 @@ export function RealisticInterviewView({
   onOpenTraining,
   onMockInterviewConfigSaved
 }: RealisticInterviewViewProps): JSX.Element {
-  const speech = useSpeechPlayback()
   const [mockInterviewConfig, setMockInterviewConfig] = useState<MockInterviewConfig>(() => loadMockInterviewConfig())
+  const [isReferenceExpanded, setIsReferenceExpanded] = useState(false)
+  const speech = useSpeechPlayback({ voiceURI: mockInterviewConfig.interviewerVoiceURI })
   const activeRound = rounds.find((round) => !round.answer?.trim())
   const latestAnsweredRound = [...rounds].reverse().find((round) => round.answer?.trim())
   const activeRoundNumber = activeRound ? rounds.findIndex((round) => round.id === activeRound.id) + 1 : 0
@@ -107,6 +108,9 @@ export function RealisticInterviewView({
         : null,
     [answerSpeechStats, normalizedAnswerText]
   )
+  const referenceText = activeRound?.referenceAnswer || finalReport || '开始面试后，这里会显示当前题的简短参考答法；整场结束后会切换为复盘报告。'
+  const referenceTitle = activeRound ? '当前题参考答法' : finalReport ? '本轮复盘报告' : '面试提示'
+  const referenceIsLong = referenceText.length > 520
 
   useEffect(() => {
     if (speech.autoSpeak && activeRound?.question) {
@@ -139,6 +143,10 @@ export function RealisticInterviewView({
 
   function speakMockIntro(): void {
     speech.speak(buildMockIntro(mockInterviewConfig, settings.resume.profileName || settings.resume.candidateName || '当前候选人'))
+  }
+
+  function previewInterviewerVoice(): void {
+    speech.speak('你好，我是今天的面试官。接下来我会用这套声音向你提问，请你按照正式线上面试的节奏回答。')
   }
 
   function speakCurrentQuestion(): void {
@@ -200,7 +208,7 @@ export function RealisticInterviewView({
           <div className={speech.isSupported ? 'realistic-readiness-card ready' : 'realistic-readiness-card warning'}>
             <Volume2 size={17} />
             <span>语音播报</span>
-            <strong>{speech.isSupported ? '可用' : '不可用'}</strong>
+            <strong>{speech.isSupported ? (speech.voices.length > 0 ? `${speech.voices.length} 种可选` : '可朗读') : '不可用'}</strong>
           </div>
           <div className="realistic-readiness-card">
             <Clock3 size={17} />
@@ -213,7 +221,11 @@ export function RealisticInterviewView({
           <MockInterviewConfigPanel
             config={mockInterviewConfig}
             disabled={isGeneratingTraining || Boolean(activeRound)}
+            selectedVoiceLabel={speech.selectedVoiceLabel}
+            voiceOptions={speech.voices}
+            voiceSupported={speech.isSupported}
             onChange={setMockInterviewConfig}
+            onPreviewVoice={previewInterviewerVoice}
             onSave={saveMockConfig}
             onReset={resetMockConfig}
           />
@@ -224,6 +236,7 @@ export function RealisticInterviewView({
             isSupported={speech.isSupported}
             isSpeaking={speech.isSpeaking}
             autoSpeak={speech.autoSpeak}
+            selectedVoiceLabel={speech.selectedVoiceLabel}
             onSpeakIntro={speakMockIntro}
             onSpeakQuestion={speakCurrentQuestion}
             onStop={speech.stop}
@@ -284,9 +297,10 @@ export function RealisticInterviewView({
           )}
 
           <label className="field-block tall realistic-answer-box">
-            <span>你的回答记录</span>
+            <span>你的回答记录（可手动输入）</span>
             <textarea
-              placeholder="这里记录你的口头回答，也可以手动补充。"
+              aria-label="手动输入回答记录"
+              placeholder="直接在这里输入回答；也可以先用语音转写，再手动修改。"
               value={currentAnswer}
               onChange={(event) => onCurrentAnswerChange(event.target.value)}
             />
@@ -326,8 +340,21 @@ export function RealisticInterviewView({
               <span className="eyebrow">Reference Answer</span>
               <h3>参考答案 / 复盘</h3>
             </div>
+            {referenceIsLong && (
+              <button className="icon-button" type="button" onClick={() => setIsReferenceExpanded((value) => !value)} title={isReferenceExpanded ? '收起内容' : '展开完整内容'} aria-label={isReferenceExpanded ? '收起内容' : '展开完整内容'}>
+                {isReferenceExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+            )}
           </div>
-          <p>{activeRound?.referenceAnswer || finalReport || '开始面试后，这里会显示根据简历资料和 AI 优化出来的参考答案；结束后显示整场复盘。'}</p>
+          <div className={referenceIsLong && !isReferenceExpanded ? 'realistic-reference-content collapsed' : 'realistic-reference-content'}>
+            <span className="realistic-reference-label">{referenceTitle}</span>
+            <p>{referenceText}</p>
+          </div>
+          {referenceIsLong && (
+            <button className="ghost-button compact realistic-reference-toggle" type="button" onClick={() => setIsReferenceExpanded((value) => !value)}>
+              {isReferenceExpanded ? '收起完整内容' : '展开完整内容'}
+            </button>
+          )}
           <div className="realistic-control-row">
             <button className="ghost-button compact" type="button" onClick={onOpenResume}>
               <UserRoundCheck size={15} />

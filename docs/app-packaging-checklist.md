@@ -14,7 +14,7 @@
 
 ## □ 2. 应用图标
 
-- [ ] 已准备应用图标（至少需要 256x256 PNG 或 .ico）
+- [x] 已准备应用图标（至少需要 256x256 PNG 或 .ico）：`build/icon.ico`
 - [ ] 图标在任务栏和标题栏显示正常
 - [ ] 图标在文件资源管理器中显示正常
 
@@ -99,6 +99,8 @@
 - GitHub Actions 已发布 `v0.1.1`，Release 附件包含安装包、blockmap、`latest.yml`。
 - 已安装的 `0.1.0` 能自动下载 `0.1.1` 到 `%LOCALAPPDATA%/huomiantong-updater/pending/`。
 - 使用下载到的 `0.1.1` 更新包覆盖安装成功，安装目录 `app.asar/package.json` 确认为 `0.1.1`，更新后可启动。
-- 待补验收：设置页「重启安装」按钮人工点击、真实 API Key 保存读取、麦克风/电脑音频真测、任务栏/安装器图标、代码签名。
+- 已把现有 `huomiantong-logo.png` 转为 `build/icon.ico`，并接入 exe、安装器和卸载器图标配置；`npm run dist` 已生成 `release/huomiantong-setup-0.1.1.exe`，`latest.yml` 指向 `0.1.1`。
+- 已从 `release/win-unpacked/获面通.exe` 提取到应用图标；任务栏、标题栏、资源管理器里的实际显示仍需人工看一眼。
+- 待补验收：设置页「重启安装」按钮人工点击、真实 API Key 保存读取、麦克风/电脑音频真测、任务栏/标题栏/资源管理器图标视觉复核、代码签名。
 
 > 完成以上检查后，可参考 `docs/packaged-app-regression.md` 做打包后人工验收。

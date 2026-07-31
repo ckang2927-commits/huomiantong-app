@@ -1929,7 +1929,7 @@ button:active:not(:disabled),
 
 .realistic-question-card,
 .realistic-answer-capture,
-.realistic-reference-panel p {
+.realistic-reference-content {
   padding: 14px;
   border: 1px solid #d9e8de;
   border-radius: 15px;
@@ -2009,10 +2009,45 @@ button:active:not(:disabled),
 .realistic-question-card p,
 .realistic-answer-capture span,
 .realistic-answer-capture p,
-.realistic-reference-panel p {
+.realistic-reference-content p {
   margin: 0;
   color: #667570;
   line-height: 1.65;
+}
+
+.realistic-reference-content {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  max-height: 560px;
+  overflow: auto;
+}
+
+.realistic-reference-content.collapsed {
+  max-height: 260px;
+  overflow: hidden;
+}
+
+.realistic-reference-content.collapsed::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 72px;
+  border-radius: 0 0 15px 15px;
+  background: linear-gradient(180deg, rgba(249, 252, 250, 0), #f9fcfa 76%);
+  content: "";
+  pointer-events: none;
+}
+
+.realistic-reference-label {
+  color: #53645f;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.realistic-reference-toggle {
+  justify-self: start;
 }
 
 .realistic-answer-capture {
@@ -2685,6 +2720,29 @@ button:active:not(:disabled),
 
 .mock-config-select-row .field-block {
   margin-top: 0;
+}
+
+.mock-voice-field {
+  grid-column: 1 / -1;
+}
+
+.mock-voice-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.mock-voice-picker select {
+  min-width: 0;
+}
+
+.mock-voice-field small {
+  margin-top: 4px;
+  color: #6e7c77;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .mock-config-preview {
@@ -3542,11 +3600,50 @@ button:active:not(:disabled),
   font-size: 16px;
 }
 
-.training-reference-answer p {
+.training-reference-content {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  max-height: 560px;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid #d9e8de;
+  border-radius: 12px;
+  background: #f9fcfa;
+}
+
+.training-reference-content.collapsed {
+  max-height: 240px;
+  overflow: hidden;
+}
+
+.training-reference-content.collapsed::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 64px;
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(180deg, rgba(249, 252, 250, 0), #f9fcfa 76%);
+  content: "";
+  pointer-events: none;
+}
+
+.training-reference-label {
+  color: #53645f;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.training-reference-content p {
   margin: 0;
   color: #31413e;
   line-height: 1.75;
   white-space: pre-wrap;
+}
+
+.training-reference-toggle {
+  justify-self: start;
 }
 
 .training-reference-answer > span {
@@ -8128,6 +8225,14 @@ kbd {
 
 .floating-meta-row span {
   max-width: 32%;
+}
+
+.floating-meta-row .floating-privacy-pill {
+  flex: 0 0 auto;
+  max-width: none;
+  color: #8a4a17;
+  background: #fff5e8;
+  border-color: #efd2ad;
 }
 
 .floating-live-pill {

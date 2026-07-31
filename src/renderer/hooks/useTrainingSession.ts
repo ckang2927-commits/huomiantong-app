@@ -40,6 +40,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
   const [trainingMode, setTrainingMode] = useState<TrainingMode>('comprehensive')
   const [roundCount, setRoundCount] = useState<TrainingQuestionCount>(10)
   const [questionOutline, setQuestionOutline] = useState<string[]>([])
+  const [questionFocus, setQuestionFocus] = useState<string[]>([])
   const [rounds, setRounds] = useState<TrainingRound[]>([])
   const [currentAnswer, setCurrentAnswer] = useState('')
   const [finalReport, setFinalReport] = useState('')
@@ -93,7 +94,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
     }, 600)
 
     return () => window.clearTimeout(timer)
-  }, [settings, trainingMode, roundCount, questionOutline, rounds, currentAnswer, finalReport, lastProvider, lastLatencyMs, savedSessionId, savedSessionTitle, lastSavedAt])
+  }, [settings, trainingMode, roundCount, questionOutline, questionFocus, rounds, currentAnswer, finalReport, lastProvider, lastLatencyMs, savedSessionId, savedSessionTitle, lastSavedAt])
 
   useEffect(() => {
     const entry = buildTrainingTrendEntry({
@@ -133,6 +134,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
       mode: trainingMode,
       count: nextRoundCount,
       outline: questionOutline,
+      focus: options?.mockInterviewConfig?.focus || questionFocus,
       mockInterviewConfig: options?.mockInterviewConfig
     })
   }
@@ -158,11 +160,13 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
     setTrainingMode(preset.trainingMode)
     setRoundCount(preset.roundCount)
     setQuestionOutline(normalizeQuestionOutline(preset.questionOutline))
+    setQuestionFocus(normalizeQuestionFocus(preset.focus))
     await beginTraining({
       settingsForRequest: nextSettings,
       mode: preset.trainingMode,
       count: preset.roundCount,
       outline: normalizeQuestionOutline(preset.questionOutline),
+      focus: normalizeQuestionFocus(preset.focus),
       presetLabel: preset.label
     })
   }
@@ -182,11 +186,13 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
     setTrainingMode(plan.mode)
     setRoundCount(nextRoundCount)
     setQuestionOutline(outline)
+    setQuestionFocus([])
     await beginTraining({
       settingsForRequest: settings,
       mode: plan.mode,
       count: nextRoundCount,
       outline,
+      focus: [],
       presetLabel: plan.label
     })
   }
@@ -196,6 +202,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
     mode,
     count,
     outline,
+    focus,
     mockInterviewConfig,
     presetLabel
   }: {
@@ -203,6 +210,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
     mode: TrainingMode
     count: TrainingQuestionCount
     outline: string[]
+    focus?: string[]
     mockInterviewConfig?: MockInterviewConfig
     presetLabel?: string
   }): Promise<void> {
@@ -216,6 +224,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
 
     setIsGeneratingTraining(true)
     setRoundCount(count)
+    setQuestionFocus(normalizeQuestionFocus(focus))
     setRounds([])
     setCurrentAnswer('')
     setFinalReport('')
@@ -229,6 +238,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
         trainingMode: mode,
         roundCount: count,
         questionOutline: outline,
+        questionFocus: normalizeQuestionFocus(focus),
         mockInterviewConfig: mockInterviewConfig || loadMockInterviewConfig(),
         rounds: []
       })
@@ -291,6 +301,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
         trainingMode,
         roundCount,
         questionOutline,
+        questionFocus,
         mockInterviewConfig: loadMockInterviewConfig(),
         rounds: answeredRounds
       })
@@ -330,6 +341,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
     setCurrentAnswer('')
     setFinalReport('')
     setQuestionOutline([])
+    setQuestionFocus([])
     setLastLatencyMs(0)
     setSavedSessionId(undefined)
     setSavedSessionTitle('')
@@ -471,6 +483,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
   function updateTrainingMode(mode: TrainingMode): void {
     setTrainingMode(mode)
     setQuestionOutline([])
+    setQuestionFocus([])
   }
 
   function updateRoundCount(count: TrainingQuestionCount): void {
@@ -522,6 +535,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
         trainingMode,
         roundCount,
         questionOutline,
+        questionFocus,
         rounds,
         currentAnswer,
         finalReport,
@@ -542,6 +556,7 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
     setTrainingMode(draft.trainingMode)
     setRoundCount(draft.roundCount)
     setQuestionOutline(draft.questionOutline)
+    setQuestionFocus(draft.questionFocus)
     setRounds(draft.rounds)
     setCurrentAnswer(draft.currentAnswer)
     setFinalReport(draft.finalReport)
@@ -556,6 +571,10 @@ export function useTrainingSession({ settings, setUsageStats, saveSessionSnapsho
 
 function normalizeQuestionOutline(value?: string[]): string[] {
   return Array.isArray(value) ? value.map((question) => question.trim()).filter(Boolean).slice(0, 20) : []
+}
+
+function normalizeQuestionFocus(value?: string[]): string[] {
+  return Array.isArray(value) ? value.map((item) => item.trim()).filter(Boolean).slice(0, 12) : []
 }
 
 function normalizeRuntimeQuestionCount(value: unknown): TrainingQuestionCount {

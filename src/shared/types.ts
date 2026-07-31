@@ -265,6 +265,19 @@ export interface DesktopAudioSource {
   thumbnail: string
 }
 
+export interface LocalSpeechSynthesisRequest {
+  text: string
+  voiceURI: string
+  speed?: number
+}
+
+export interface LocalSpeechSynthesisResult {
+  voiceURI: string
+  mimeType: 'audio/wav'
+  sampleRate: number
+  audio: ArrayBuffer
+}
+
 export interface TranscriptLine {
   id: string
   speaker: 'interviewer' | 'candidate'
@@ -373,6 +386,7 @@ export interface TrainingTurnRequest {
   trainingMode: TrainingMode
   roundCount: TrainingQuestionCount
   questionOutline?: string[]
+  questionFocus?: string[]
   mockInterviewConfig?: MockInterviewConfig
   rounds: TrainingRound[]
 }
@@ -477,6 +491,7 @@ export interface FloatingPayload {
   candidateName?: string
   targetRole?: string
   queuedCount?: number
+  privacyMode?: boolean
   records?: Array<{
     id: string
     kind: 'question' | 'answer'

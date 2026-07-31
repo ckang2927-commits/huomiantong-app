@@ -142,12 +142,13 @@ export function FloatingWindow(): JSX.Element {
         }}
       >
         <section className="floating-stage">
-          <div className="floating-meta-row">
-            <span>{payload.candidateName || '未选择候选人'}</span>
-            <span>{payload.targetRole || '未设置岗位'}</span>
-            <span>{records.length} 条记录</span>
-            <strong className={`floating-live-pill ${payload.status}`}>{statusText(payload.status, payload.queuedCount)}</strong>
-          </div>
+        <div className="floating-meta-row">
+          <span>{payload.candidateName || '未选择候选人'}</span>
+          <span>{payload.targetRole || '未设置岗位'}</span>
+          <span>{records.length} 条记录</span>
+          {payload.privacyMode && <span className="floating-privacy-pill">隐私保护</span>}
+          <strong className={`floating-live-pill ${payload.status}`}>{statusText(payload.status, payload.queuedCount)}</strong>
+        </div>
 
           <div className="floating-question-card">
             <span>当前问题</span>

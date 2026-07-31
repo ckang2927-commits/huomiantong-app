@@ -77,7 +77,7 @@ function buildReason(original: string, corrected: string): string {
 }
 
 function normalizeQuestion(value: string): string {
-  return normalizeSpacing(value)
+  return cleanupSpeechRepeats(normalizeSpacing(value))
     .replace(/[，。！？、；;:,.]/g, '')
     .trim()
 }
@@ -87,4 +87,31 @@ function normalizeSpacing(value: string): string {
     .replace(/\s+/g, ' ')
     .replace(/([，。！？、；;:,.])/g, '$1')
     .trim()
+}
+
+function cleanupSpeechRepeats(value: string): string {
+  let cleaned = value.trim()
+
+  for (let i = 0; i < 4; i += 1) {
+    const next = cleaned
+      .replace(/哪里里+$/g, '哪里')
+      .replace(/哪儿儿+$/g, '哪儿')
+      .replace(/在哪哪+$/g, '在哪')
+      .replace(/什么么+$/g, '什么')
+      .replace(/怎么么+$/g, '怎么')
+      .replace(/如何何+$/g, '如何')
+      .replace(/项目目+$/g, '项目')
+      .replace(/公司司+$/g, '公司')
+      .replace(/经历历+$/g, '经历')
+      .replace(/介绍绍+$/g, '介绍')
+      .replace(/([的了过])\1+$/g, '$1')
+      .replace(/(哪里|哪儿|在哪|什么|怎么|如何|项目|公司|经历|介绍)\1+$/g, '$1')
+      .replace(/([\u4e00-\u9fff])\1{2,}$/g, '$1')
+      .replace(/([呢吗吧啊呀噢哦嘛])\1+$/g, '$1')
+
+    if (next === cleaned) break
+    cleaned = next
+  }
+
+  return cleaned
 }

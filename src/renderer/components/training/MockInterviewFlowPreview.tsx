@@ -7,6 +7,7 @@ type MockInterviewFlowPreviewProps = {
   isSupported: boolean
   isSpeaking: boolean
   autoSpeak: boolean
+  selectedVoiceLabel: string
   onSpeakIntro: () => void
   onSpeakQuestion: () => void
   onStop: () => void
@@ -27,6 +28,7 @@ export function MockInterviewFlowPreview({
   isSupported,
   isSpeaking,
   autoSpeak,
+  selectedVoiceLabel,
   onSpeakIntro,
   onSpeakQuestion,
   onStop,
@@ -99,7 +101,7 @@ export function MockInterviewFlowPreview({
 
           <div className="mock-flow-status">
             <span>{isSupported ? '浏览器语音播报可用' : '当前环境不支持语音播报'}</span>
-            <small>第一版先接可见播报壳子，后面再接真实 AI 面试官生成与节奏控制。</small>
+            <small>{isSupported ? `当前声音：${selectedVoiceLabel}` : '需要系统语音组件可用后才能朗读。'}</small>
           </div>
         </aside>
       </div>

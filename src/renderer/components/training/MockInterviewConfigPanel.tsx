@@ -1,4 +1,4 @@
-import { RotateCcw, Save } from 'lucide-react'
+import { RotateCcw, Save, Volume2 } from 'lucide-react'
 import {
   defaultMockInterviewConfig,
   mockInterviewFocusOptions,
@@ -7,6 +7,7 @@ import {
   type MockInterviewerStyle,
   type MockQuestionStrategy
 } from '../../lib/mockInterviewConfigStore'
+import type { SpeechVoiceOption } from '../../hooks/useSpeechPlayback'
 
 const durationOptions = [10, 20, 30, 45, 60]
 const questionCountOptions = [5, 10, 15, 20]
@@ -36,14 +37,30 @@ const questionStrategyOptions: Array<{ value: MockQuestionStrategy; label: strin
 type MockInterviewConfigPanelProps = {
   config: MockInterviewConfig
   disabled?: boolean
+  selectedVoiceLabel: string
+  voiceOptions: SpeechVoiceOption[]
+  voiceSupported: boolean
   onChange: (config: MockInterviewConfig) => void
+  onPreviewVoice: () => void
   onSave: () => void
   onReset: () => void
 }
 
-export function MockInterviewConfigPanel({ config, disabled = false, onChange, onSave, onReset }: MockInterviewConfigPanelProps): JSX.Element {
+export function MockInterviewConfigPanel({
+  config,
+  disabled = false,
+  selectedVoiceLabel,
+  voiceOptions,
+  voiceSupported,
+  onChange,
+  onPreviewVoice,
+  onSave,
+  onReset
+}: MockInterviewConfigPanelProps): JSX.Element {
   const isCustomDuration = !durationOptions.includes(config.durationMinutes)
   const isCustomQuestionCount = !questionCountOptions.includes(config.questionCount)
+  const localVoiceOptions = voiceOptions.filter((option) => option.source === 'local')
+  const systemVoiceOptions = voiceOptions.filter((option) => option.source !== 'local')
 
   function update(patch: Partial<MockInterviewConfig>): void {
     onChange({ ...config, ...patch })
@@ -181,6 +198,37 @@ export function MockInterviewConfigPanel({ config, disabled = false, onChange, o
                   </option>
                 ))}
               </select>
+            </label>
+            <label className="field-block mock-voice-field">
+              <span>面试官声音</span>
+              <div className="mock-voice-picker">
+                <select value={config.interviewerVoiceURI} disabled={disabled || !voiceSupported} onChange={(event) => update({ interviewerVoiceURI: event.target.value })}>
+                  <option value="">系统推荐中文声音</option>
+                  {localVoiceOptions.length > 0 && (
+                    <optgroup label="本地离线声音">
+                      {localVoiceOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {systemVoiceOptions.length > 0 && (
+                    <optgroup label="系统声音">
+                      {systemVoiceOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                </select>
+                <button className="ghost-button compact icon-button-with-text" type="button" onClick={onPreviewVoice} disabled={!voiceSupported}>
+                  <Volume2 size={15} />
+                  试听
+                </button>
+              </div>
+              <small>{voiceSupported ? `${voiceOptions.length > 0 ? `${voiceOptions.length} 种可选` : '声音列表加载中'} · 当前：${selectedVoiceLabel}` : '当前环境暂不支持语音试听'}</small>
             </label>
             <label className="field-block">
               <span>追问策略</span>

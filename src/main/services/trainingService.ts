@@ -4,6 +4,7 @@ import { callOpenAiCompatible } from './modelClient'
 import { roleJdForMode } from '../../shared/roleJdTemplates'
 import { trainingModeLabels } from '../../shared/trainingOptions'
 import { normalizeMockInterviewConfig, type MockInterviewConfig } from '../../shared/mockInterview'
+import { selectDataAnalystInterviewQuestion } from '../../shared/dataAnalystInterviewQuestionBank'
 import type { AppSettings, TrainingMode, TrainingRound, TrainingTurnRequest, TrainingTurnResult } from '../../shared/types'
 
 type ParsedTrainingResponse = {
@@ -12,6 +13,12 @@ type ParsedTrainingResponse = {
   nextQuestion?: string
   referenceAnswer?: string
   finalReport?: string
+}
+
+type NextQuestionPlan = {
+  nextQuestion?: string
+  nextQuestionKind?: 'base' | 'followUp'
+  referenceAnswer?: string
 }
 
 const fallbackQuestions: Record<TrainingMode, string[]> = {
@@ -76,7 +83,7 @@ export async function generateTrainingTurn(request: TrainingTurnRequest): Promis
       score: clampScore(parsed.score ?? localResult.score),
       nextQuestion: isDone ? undefined : scheduler.nextQuestion || localResult.nextQuestion,
       nextQuestionKind: isDone ? undefined : scheduler.nextQuestionKind || localResult.nextQuestionKind,
-      referenceAnswer: isDone ? undefined : scheduler.nextQuestion ? buildLocalReferenceAnswer(settings, scheduler.nextQuestion) : undefined,
+      referenceAnswer: isDone ? undefined : scheduler.referenceAnswer || (scheduler.nextQuestion ? buildLocalReferenceAnswer(settings, scheduler.nextQuestion) : undefined),
       finalReport: isDone ? parsed.finalReport || localResult.finalReport : undefined,
       done: isDone,
       provider,
@@ -97,7 +104,7 @@ function buildTrainingPrompt(
   settings: AppSettings,
   request: TrainingTurnRequest,
   mockConfig: MockInterviewConfig,
-  scheduler: { nextQuestion?: string; nextQuestionKind?: 'base' | 'followUp' }
+  scheduler: NextQuestionPlan
 ): string {
   const resume = settings.resume
   const currentRound = request.rounds.length
@@ -154,7 +161,7 @@ function buildTrainingPrompt(
   ].join('\n')
 }
 
-function buildNextQuestionPlan(settings: AppSettings, request: TrainingTurnRequest, mockConfig: MockInterviewConfig): { nextQuestion?: string; nextQuestionKind?: 'base' | 'followUp' } {
+function buildNextQuestionPlan(settings: AppSettings, request: TrainingTurnRequest, mockConfig: MockInterviewConfig): NextQuestionPlan {
   const isDone = answeredCount(request.rounds) >= request.roundCount
 
   if (isDone) {
@@ -174,7 +181,7 @@ function buildNextQuestionPlan(settings: AppSettings, request: TrainingTurnReque
   }
 
   return {
-    nextQuestion: buildBaseQuestion(settings, request.trainingMode, baseQuestionIndex, outline),
+    ...buildBaseQuestion(settings, request, mockConfig, baseQuestionIndex, outline),
     nextQuestionKind: 'base'
   }
 }
@@ -182,7 +189,7 @@ function buildNextQuestionPlan(settings: AppSettings, request: TrainingTurnReque
 function buildLocalTrainingTurn(
   settings: AppSettings,
   request: TrainingTurnRequest,
-  scheduler: { nextQuestion?: string; nextQuestionKind?: 'base' | 'followUp' },
+  scheduler: NextQuestionPlan,
   latencyMs: number
 ): TrainingTurnResult {
   const lastRound = request.rounds.at(-1)
@@ -195,7 +202,7 @@ function buildLocalTrainingTurn(
     score,
     nextQuestion: scheduler.nextQuestion,
     nextQuestionKind: scheduler.nextQuestionKind,
-    referenceAnswer: scheduler.nextQuestion ? buildLocalReferenceAnswer(settings, scheduler.nextQuestion) : undefined,
+    referenceAnswer: scheduler.referenceAnswer || (scheduler.nextQuestion ? buildLocalReferenceAnswer(settings, scheduler.nextQuestion) : undefined),
     finalReport: isDone ? buildLocalFinalReport(settings, request.rounds) : undefined,
     done: isDone,
     provider: 'local',
@@ -203,17 +210,58 @@ function buildLocalTrainingTurn(
   }
 }
 
-function buildBaseQuestion(settings: AppSettings, mode: TrainingMode, baseIndex: number, outline: string[]): string {
+function buildBaseQuestion(
+  settings: AppSettings,
+  request: TrainingTurnRequest,
+  mockConfig: MockInterviewConfig,
+  baseIndex: number,
+  outline: string[]
+): { nextQuestion: string; referenceAnswer?: string } {
   const outlineQuestion = outline[baseIndex]
+  const defaultDataAnalystFocus = ['指标体系', 'SQL/取数', '建模分析', 'A/B 实验', '业务结论']
 
   if (outlineQuestion) {
-    return outlineQuestion
+    return { nextQuestion: outlineQuestion }
   }
 
-  const pool = fallbackQuestions[mode]
+  if (isDataAnalystContext(settings)) {
+    const questionFocus = normalizeQuestionFocus(request.questionFocus, [...mockConfig.focus, ...defaultDataAnalystFocus])
+    const bankItem = selectDataAnalystInterviewQuestion({
+      difficulty: mockConfig.difficulty,
+      focus: questionFocus,
+      trainingMode: request.trainingMode,
+      usedQuestions: request.rounds.map((round) => round.question),
+      baseIndex
+    })
+
+    return {
+      nextQuestion: bankItem.question,
+      referenceAnswer: bankItem.referenceAnswer
+    }
+  }
+
+  const pool = fallbackQuestions[request.trainingMode]
   const question = pool[baseIndex % pool.length]
 
-  return question || `请围绕 ${settings.resume.targetRole || '目标岗位'} 讲一个你最有把握的经历。`
+  return { nextQuestion: question || `请围绕 ${settings.resume.targetRole || '目标岗位'} 讲一个你最有把握的经历。` }
+}
+
+function normalizeQuestionFocus(value: string[] | undefined, fallback: string[]): string[] {
+  const focus = Array.isArray(value)
+    ? value.map((item) => item.trim()).filter(Boolean).slice(0, 12)
+    : []
+
+  return focus.length > 0 ? focus : fallback
+}
+
+function isDataAnalystContext(settings: AppSettings): boolean {
+  const targetText = [
+    settings.answer.interviewMode,
+    settings.resume.targetRole,
+    roleJdForMode(settings.answer.interviewMode, settings.answer.roleJdTemplates)
+  ].join('\n')
+
+  return settings.answer.interviewMode === 'dataAnalyst' || /数据分析|数据分析师|商业分析|经营分析|BI|Data\s*Analyst|Business\s*Analyst/i.test(targetText)
 }
 
 function buildFollowUpQuestion(lastRound: TrainingRound, settings: AppSettings, mockConfig: MockInterviewConfig): string {
@@ -337,12 +385,17 @@ function buildLocalReferenceAnswer(settings: AppSettings, question: string): str
     '参考答法：',
     '这个问题我会结合自己简历里的真实经历来讲。我的核心思路是先交代背景和目标，再说我负责的动作，最后用结果或复盘收尾。',
     '',
-    '可用依据：',
-    ...evidence.map((item, index) => `${index + 1}. ${item.text}`),
+    '可用依据摘要：',
+    ...evidence.map((item, index) => `${index + 1}. ${item.sourceLabel || item.source}：${compactEvidence(item.text)}`),
     '',
     '表达建议：',
     '回答时尽量按“背景 → 我的动作 → 结果/影响 → 复盘”的顺序讲，尽量补一个可以验证的数字或过程。'
   ].join('\n')
+}
+
+function compactEvidence(value: string): string {
+  const compact = value.replace(/\s+/g, ' ').trim()
+  return compact.length > 140 ? `${compact.slice(0, 140)}…` : compact
 }
 
 function buildLocalFeedback(answer: string, score: number, nextQuestionKind?: 'base' | 'followUp'): string {

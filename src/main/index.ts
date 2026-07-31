@@ -19,6 +19,7 @@ import { generateBackgroundPrep, searchBackgroundPublicInfo } from './services/b
 import { openDocFile } from './services/docService'
 import { generateInterviewReviewDeepReport, generateInterviewReviewDeepTalk } from './services/interviewReviewEnhancementService'
 import { transcribeInterviewAudio } from './services/interviewReviewService'
+import { synthesizeLocalSpeech } from './services/localTtsService'
 import { generateRoleJd } from './services/roleJdService'
 import { generateTrainingTurn } from './services/trainingService'
 import {
@@ -52,6 +53,7 @@ import type {
   InterviewReviewDeepTalkRequest,
   InterviewReviewTranscriptionRequest,
   LlmProviderId,
+  LocalSpeechSynthesisRequest,
   ProviderConfig,
   ProviderId,
   RoleJdGenerateRequest,
@@ -110,6 +112,7 @@ app.whenReady().then(() => {
   ipcMain.handle('usage:set-money-budget', (_event, provider: LlmProviderId, budgetCny: number) => setUsageMoneyBudget(provider, budgetCny))
   ipcMain.handle('desktop:sources', listDesktopAudioSources)
   ipcMain.handle('desktop:set-source', (_event, sourceId: string) => setDesktopAudioSourceId(sourceId))
+  ipcMain.handle('tts:synthesize', (_event, request: LocalSpeechSynthesisRequest) => synthesizeLocalSpeech(request))
   ipcMain.handle('backup:export', (_event, options) => exportBackup(options))
   ipcMain.handle('backup:import', (_event, payload: Partial<BackupPayload>) => importBackup(payload))
   ipcMain.handle('floating:update', (_event, payload: FloatingPayload) => sendFloatingPayload(payload))

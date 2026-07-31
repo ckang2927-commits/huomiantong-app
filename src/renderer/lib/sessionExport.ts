@@ -32,10 +32,10 @@ export function maskSensitiveInfo(text: string, privacyMode?: boolean): string {
 
   return text
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '***@***')
-    .replace(/(?:\+?86[-\s]?)?1[3-9]\d{9}/g, '***手机号***')
-    .replace(/[\u4e00-\u9fffA-Za-z0-9（）()]{2,}(?:有限公司|有限责任公司|科技股份有限公司|股份有限公司|科技公司|集团|公司)/g, '***公司')
-    .replace(/[\u4e00-\u9fff]{2,4}(?:同学|先生|女士|老师)/g, '***')
-    .replace(/(?:我叫|姓名|称呼|候选人)[：:]\s*[\u4e00-\u9fff]{2,4}/g, (matched) => matched.replace(/[\u4e00-\u9fff]{2,4}$/, '***'))
+    .replace(/(?:\+?86[-\s]?)?1[3-9]\d{9}/g, '[已隐藏手机号]')
+    .replace(/[\u4e00-\u9fffA-Za-z0-9（）()]{2,}(?:有限公司|有限责任公司|科技股份有限公司|股份有限公司|科技公司|集团|公司)/g, '[已隐藏公司]')
+    .replace(/[\u4e00-\u9fff]{2,4}(?:同学|先生|女士|老师)/g, '[已隐藏姓名]')
+    .replace(/(?:我叫|姓名|称呼|候选人)[：:]\s*[\u4e00-\u9fff]{2,4}/g, (matched) => matched.replace(/[\u4e00-\u9fff]{2,4}$/, '[已隐藏姓名]'))
 }
 
 export function maskSessionText(text: string, session: InterviewSession, privacyMode?: boolean): string {
@@ -50,7 +50,7 @@ export function maskSessionText(text: string, session: InterviewSession, privacy
     .map((item) => item.trim())
 
   for (const term of Array.from(new Set(terms))) {
-    masked = masked.replace(new RegExp(escapeRegExp(term), 'g'), '***')
+    masked = masked.replace(new RegExp(escapeRegExp(term), 'g'), '[已隐藏姓名]')
   }
 
   return masked

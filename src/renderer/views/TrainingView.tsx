@@ -1,5 +1,6 @@
 ﻿import { Download, Loader2, Mic, PlayCircle, RotateCcw, Save, SendHorizontal, Square, Volume2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Radio } from 'lucide-react'
 import { BarChart3, CheckCircle2, ChevronRight, ClipboardList } from 'lucide-react'
 import { SpeechExpressionPanel } from '../components/training/SpeechExpressionPanel'
@@ -122,6 +123,7 @@ export function TrainingView({
   const speech = useSpeechPlayback()
   const questionBank = useTrainingQuestionBank({ trainingMode, rounds, finalReport })
   const [isSetupOpen, setIsSetupOpen] = useState(true)
+  const [isReferenceExpanded, setIsReferenceExpanded] = useState(false)
   const weaknessInsights = useMemo(() => buildTrainingWeaknessInsights(rounds), [rounds])
   const currentSpeechScore = useMemo(
     () =>
@@ -166,12 +168,19 @@ export function TrainingView({
     (settings.resume.otherResumes?.length ?? 0)
   const modelReady = Boolean(providerConfig.enabled && providerConfig.apiKey)
   const voiceReady = speech.isSupported
+  const referenceText = activeRound?.referenceAnswer || finalReport || '完成训练后，这里会显示参考答案或最终复盘。'
+  const referenceTitle = activeRound ? '当前题参考答案' : finalReport ? '最终复盘' : '训练提示'
+  const referenceIsLong = referenceText.length > 420
 
   useEffect(() => {
     if (speech.autoSpeak && activeRound?.question) {
       speech.speak(activeRound.question)
     }
   }, [activeRound?.id, speech.autoSpeak])
+
+  useEffect(() => {
+    setIsReferenceExpanded(false)
+  }, [activeRound?.id, finalReport])
 
   useEffect(() => {
     if (!isAnswerTranscribing || !answerSpeechStats?.lastFinalAt || !normalizedAnswerText) {
@@ -511,9 +520,9 @@ export function TrainingView({
                   {isAnswerTranscribing && isTrainingAnswerCompletionCue(normalizedAnswerText) && <p className="inline-note">已识别到回答结束信号，准备自动提交。</p>}
                 </div>
                 <label className="field-block tall training-answer-box">
-                  <span>你的回答记录</span>
+                  <span>你的回答记录（可手动输入）</span>
                   <textarea
-                    placeholder="建议先口头回答一遍，再把要点输入/粘贴到这里。提交后 AI 面试官会点评，并继续追问下一题。"
+                    placeholder="你可以直接手动输入，也可以先口头回答后再补充整理。提交后 AI 面试官会点评，并继续追问下一题。"
                     value={currentAnswer}
                     onChange={(event) => onCurrentAnswerChange(event.target.value)}
                   />
@@ -536,12 +545,26 @@ export function TrainingView({
                     <span className="eyebrow">Resume + AI Reference</span>
                     <strong>参考答案</strong>
                   </div>
-                  <button className="ghost-button compact" type="button" onClick={() => speech.speak(activeRound.referenceAnswer || '')} disabled={!speech.isSupported || !activeRound.referenceAnswer}>
-                    <Volume2 size={15} />
-                    朗读答案
-                  </button>
+                  {referenceIsLong ? (
+                    <button className="icon-button" type="button" onClick={() => setIsReferenceExpanded((value) => !value)} title={isReferenceExpanded ? '收起内容' : '展开完整内容'} aria-label={isReferenceExpanded ? '收起内容' : '展开完整内容'}>
+                      {isReferenceExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                  ) : (
+                    <button className="ghost-button compact" type="button" onClick={() => speech.speak(activeRound.referenceAnswer || '')} disabled={!speech.isSupported || !activeRound.referenceAnswer}>
+                      <Volume2 size={15} />
+                      朗读答案
+                    </button>
+                  )}
                 </div>
-                <p>{activeRound.referenceAnswer || '暂无参考答案。旧草稿里的问题可能没有参考答案，重新开始或进入下一题后会自动生成。'}</p>
+                <div className={referenceIsLong && !isReferenceExpanded ? 'training-reference-content collapsed' : 'training-reference-content'}>
+                  <span className="training-reference-label">{referenceTitle}</span>
+                  <p>{referenceText}</p>
+                </div>
+                {referenceIsLong && (
+                  <button className="ghost-button compact training-reference-toggle" type="button" onClick={() => setIsReferenceExpanded((value) => !value)}>
+                    {isReferenceExpanded ? '收起完整内容' : '展开完整内容'}
+                  </button>
+                )}
                 <span>提示：这是练习参考，不是唯一标准答案；如果简历里没有依据，不要硬编具体经历。</span>
               </aside>
             </div>
