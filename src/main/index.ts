@@ -1,4 +1,5 @@
 ﻿import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
+import { shell } from 'electron'
 import {
   deleteInterviewReviews,
   deleteSessions,
@@ -120,6 +121,7 @@ app.whenReady().then(() => {
   ipcMain.handle('floating:hide', hideFloatingWindow)
   ipcMain.handle('floating:toggle-maximize', toggleFloatingMaximize)
   ipcMain.handle('docs:open', (_event, docPath: string) => openDocFile(docPath))
+  ipcMain.handle('external:open', (_event, url: string) => shell.openExternal(url))
   ipcMain.handle('app:update-status', getCurrentUpdateStatus)
   ipcMain.handle('app:update-check', checkForUpdatesManually)
   ipcMain.handle('app:update-download', downloadAvailableUpdate)

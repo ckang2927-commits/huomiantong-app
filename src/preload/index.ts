@@ -70,6 +70,7 @@ const api = {
   hideFloating: (): Promise<void> => ipcRenderer.invoke('floating:hide'),
   toggleFloatingMaximize: (): Promise<boolean> => ipcRenderer.invoke('floating:toggle-maximize'),
   openDoc: (docPath: string): Promise<{ ok: boolean; path?: string; message?: string }> => ipcRenderer.invoke('docs:open', docPath),
+  openExternal: (url: string): Promise<void> => ipcRenderer.invoke('external:open', url),
   restartApp: (): Promise<{ mode: 'reload' | 'relaunch' }> => ipcRenderer.invoke('app:restart'),
   getUpdateStatus: (): Promise<AppUpdateStatus> => ipcRenderer.invoke('app:update-status'),
   checkForUpdates: (): Promise<AppUpdateStatus> => ipcRenderer.invoke('app:update-check'),

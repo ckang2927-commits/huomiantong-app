@@ -36,6 +36,7 @@ import { SessionsView } from './views/SessionsView'
 import { TrainingView } from './views/TrainingView'
 import { WorkspaceView } from './views/WorkspaceView'
 import { UpdateExperience } from './components/UpdateExperience'
+import { NewUserOnboarding } from './components/NewUserOnboarding'
 import type { AppSettings, InterviewSession, TrainingPreset, WarmupQuestionCount, UsageStats, ProviderId, ProviderTestResult } from '../shared/types'
 
 // Wrapper: 闂?store 闂?setUsageStats 闂傚倸鍊搁崐鎼佸磹閻戣姤鍤勯柛顐ｆ磵閳ь剨绠撳畷濂稿閳ュ啿绨ラ梻浣告贡閸庛倝銆冮崨鏉戠＜闁靛ě鍕瀾闂佸搫鍟悧鍕焵?Dispatch 缂傚倸鍊搁崐鎼佸磹閹间礁纾瑰瀣椤愪粙鏌ㄩ悢鍝勑㈢痪鎹愵嚙椤潡鎳滈棃娑樞曢梺杞扮椤戝洭骞夐幖浣哥睄闁割偅绻勯悾?
@@ -830,6 +831,7 @@ export function App(): JSX.Element {
         )}
       </main>
       <UpdateExperience />
+      <NewUserOnboarding />
       {toast && <ToastNotice toast={toast} onOpenDiagnostics={openDiagnosticsFromToast} />}
     </div>
   )

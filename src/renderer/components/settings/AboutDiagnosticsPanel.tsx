@@ -1,6 +1,7 @@
 import { ClipboardList, Download, FileText, FolderOpen, Info, RefreshCw, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { AppUpdateStatus } from '../../../shared/types'
+import { startNewUserOnboarding } from '../NewUserOnboarding'
 
 export function AboutDiagnosticsPanel(): JSX.Element {
   const [restartStatus, setRestartStatus] = useState('')
@@ -107,6 +108,9 @@ export function AboutDiagnosticsPanel(): JSX.Element {
         </div>
         <button className="ghost-button compact" type="button" onClick={handleRestart}>
           重启应用
+        </button>
+        <button className="ghost-button compact" type="button" onClick={startNewUserOnboarding}>
+          新手引导
         </button>
       </div>
       {restartStatus && <p className="about-note">{restartStatus}</p>}

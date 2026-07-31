@@ -9279,6 +9279,196 @@ body.floating-resizing {
   margin-top: 22px;
 }
 
+/* ========== 新用户引导 ========== */
+.onboarding-backdrop {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(24, 34, 31, 0.58);
+  backdrop-filter: blur(2px);
+}
+
+.onboarding-card {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  padding: 26px;
+  border: 1px solid #dce8e1;
+  border-radius: 12px;
+  background: #fffdf8;
+  box-shadow: 0 20px 64px rgba(31, 43, 39, 0.26);
+}
+
+.onboarding-welcome {
+  width: min(680px, 100%);
+}
+
+.onboarding-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.onboarding-card h3 {
+  margin: 6px 0 0;
+  color: #1f2d2a;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.onboarding-card > p,
+.onboarding-body {
+  margin: 16px 0 18px;
+  color: #445551;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.onboarding-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.onboarding-choice-card {
+  display: flex;
+  min-height: 138px;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #dce8e1;
+  border-radius: 8px;
+  background: #fafbf9;
+  color: #2a4a40;
+  text-align: left;
+  cursor: pointer;
+}
+
+.onboarding-choice-card.primary {
+  border-color: #8ac5ae;
+  background: #f0faf5;
+}
+
+.onboarding-choice-card:hover {
+  border-color: #88bda9;
+  background: #f6fbf8;
+}
+
+.onboarding-choice-card strong {
+  color: #1f2d2a;
+  font-size: 15px;
+}
+
+.onboarding-choice-card span {
+  color: #60706c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.onboarding-progress {
+  display: grid;
+  grid-template-columns: repeat(var(--step-count, 5), 1fr);
+  gap: 6px;
+  margin: 4px 44px 22px 0;
+}
+
+.onboarding-progress span {
+  height: 6px;
+  border-radius: 999px;
+  background: #e3ece7;
+}
+
+.onboarding-progress span.active {
+  background: #267d71;
+}
+
+.onboarding-step-head {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.onboarding-step-icon {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #e8f5ef;
+  color: #267d71;
+}
+
+.onboarding-link-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid #dce8e1;
+  border-radius: 8px;
+  background: #fafbf9;
+}
+
+.onboarding-link-panel strong {
+  color: #1f2d2a;
+  font-size: 14px;
+}
+
+.onboarding-link-panel span {
+  color: #60706c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.onboarding-link-panel div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.onboarding-focus-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid #1f7f70;
+  border-radius: 8px;
+  background: #267d71;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(38, 125, 113, 0.2);
+}
+
+.onboarding-focus-button:hover {
+  background: #1f6f64;
+}
+
+.onboarding-secondary-action {
+  margin-top: 10px;
+}
+
+.onboarding-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e4ece8;
+}
+
 @media (max-width: 680px) {
   .app-modal-backdrop {
     align-items: flex-end;
@@ -9297,6 +9487,24 @@ body.floating-resizing {
   .app-modal-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .onboarding-backdrop {
+    align-items: flex-end;
+    padding: 12px;
+  }
+
+  .onboarding-card {
+    max-height: calc(100vh - 24px);
+    padding: 20px;
+  }
+
+  .onboarding-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-actions {
+    flex-direction: column-reverse;
   }
 }
 

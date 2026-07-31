@@ -1,4 +1,5 @@
 ﻿import { useState, type ChangeEvent, type RefObject } from 'react'
+import { useEffect } from 'react'
 import { Briefcase, Cpu, FileText, GraduationCap, Keyboard, MessageSquare, Mic, Settings2, Shield } from 'lucide-react'
 import { AboutDiagnosticsPanel } from '../components/settings/AboutDiagnosticsPanel'
 import { ApiModelConsole } from '../components/settings/ApiModelConsole'
@@ -50,6 +51,19 @@ export function SettingsView({
 }: SettingsViewProps): JSX.Element {
   const [activeSection, setActiveSection] = useState<SettingsSectionId>('api')
   const activeMeta = SETTINGS_SECTIONS.find((section) => section.id === activeSection) ?? SETTINGS_SECTIONS[0]
+
+  useEffect(() => {
+    const handleSettingsSection = (event: Event): void => {
+      const section = (event as CustomEvent<{ section?: SettingsSectionId }>).detail?.section
+
+      if (section && SETTINGS_SECTIONS.some((item) => item.id === section)) {
+        setActiveSection(section)
+      }
+    }
+
+    window.addEventListener('huomiantong:settings-section', handleSettingsSection)
+    return () => window.removeEventListener('huomiantong:settings-section', handleSettingsSection)
+  }, [])
 
   const renderActiveSection = (): JSX.Element => {
     switch (activeSection) {
