@@ -60,7 +60,7 @@ export function TranscriptPanel({
   const sourceLabel = listeningMode === 'system' ? '电脑音频' : listeningMode === 'microphone' ? '麦克风' : '未开启'
 
   return (
-    <div className="panel transcript-panel">
+    <div className="panel transcript-panel" data-onboarding-target="workspace-transcript">
       <div className="panel-heading transcript-panel-heading">
         <div>
           <span className="eyebrow">Live Transcript</span>
@@ -85,7 +85,7 @@ export function TranscriptPanel({
         onToggleAutoAnswer={onToggleAutoAnswer}
       />
 
-      <details className="transcript-audio-settings">
+      <details className="transcript-audio-settings" data-onboarding-target="workspace-audio-settings">
         <summary>语音设置</summary>
         <AudioSettingsPanel {...audioSettings} />
       </details>

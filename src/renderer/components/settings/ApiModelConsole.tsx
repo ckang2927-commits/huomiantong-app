@@ -1,7 +1,9 @@
-import { CheckCircle2, CircleDollarSign, Cpu, KeyRound, RadioTower } from 'lucide-react'
+import { CheckCircle2, CircleAlert, CircleDollarSign, Cpu, ExternalLink, KeyRound, RadioTower } from 'lucide-react'
 import type { LlmProviderId, ProviderId } from '../../../shared/types'
 import { providerNames } from '../../lib/appHelpers'
+import { recordDiagnosticLog } from '../../lib/diagnosticLog'
 import { useSettingsStore } from '../../stores/useSettingsStore'
+import { useState } from 'react'
 import { formatMoney } from '../usage/usagePricing'
 import { BudgetExplainerPanel } from './BudgetExplainerPanel'
 import { ModelProviderPanel } from './ModelProviderPanel'
@@ -21,7 +23,7 @@ export function ApiModelConsole(): JSX.Element {
   const totalBudget = answerProviders.reduce((sum, provider) => sum + (usageStats[provider]?.budgetCny || 0), 0)
 
   return (
-    <div className="api-console-page">
+    <div className="api-console-page" data-onboarding-target="settings-api">
       <section className="api-console-hero">
         <div className="api-console-copy">
           <span className="eyebrow">Model Control Center</span>
@@ -34,6 +36,8 @@ export function ApiModelConsole(): JSX.Element {
           <small>{activeConfig.model || '未选择具体模型'} · {activeConfig.enabled && activeConfig.apiKey ? '可用于回答' : '未完整配置'}</small>
         </div>
       </section>
+
+      <ApiSetupGuide providerTests={providerTests} />
 
       <div className="api-console-summary">
         <SummaryCard icon={Cpu} label="已启用服务" value={`${enabledCount} 个`} hint="包含语音和回答模型" />
@@ -60,6 +64,97 @@ export function ApiModelConsole(): JSX.Element {
         </aside>
       </div>
     </div>
+  )
+}
+
+function ApiSetupGuide({ providerTests }: { providerTests: Partial<Record<ProviderId, { ok: boolean; message: string }>> }): JSX.Element {
+  const deepseekReady = Boolean(providerTests.deepseek?.ok)
+  const deepgramReady = Boolean(providerTests.deepgram?.ok)
+  const [externalMessage, setExternalMessage] = useState<string | null>(null)
+
+  async function openExternal(url: string): Promise<void> {
+    try {
+      const result = await window.huomiantong.openExternal(url)
+
+      if (!result.ok) {
+        setExternalMessage(result.message || '未能打开网页，请检查默认浏览器设置。')
+        recordDiagnosticLog({
+          severity: 'error',
+          category: 'system',
+          source: 'API 配置引导外链',
+          title: '外链打开失败',
+          message: result.message || '默认浏览器未能打开网页',
+          details: url
+        })
+        return
+      }
+
+      setExternalMessage('网页已在默认浏览器中打开。')
+      recordDiagnosticLog({
+        severity: 'success',
+        category: 'system',
+        source: 'API 配置引导外链',
+        title: '外链已打开',
+        message: '已交给默认浏览器打开网页',
+        details: url
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '未能打开网页，请检查默认浏览器设置。'
+      setExternalMessage(message)
+      recordDiagnosticLog({
+        severity: 'error',
+        category: 'system',
+        source: 'API 配置引导外链',
+        title: '外链打开异常',
+        message,
+        details: url
+      })
+    }
+  }
+
+  return (
+    <section className="api-setup-guide">
+      <div className="api-setup-guide-heading">
+        <div>
+          <span className="eyebrow">Recommended Setup</span>
+          <h4>新手配置顺序</h4>
+        </div>
+        <span>先回答模型，再语音转写</span>
+      </div>
+      <div className="api-setup-guide-grid">
+        <article className={deepseekReady ? 'api-setup-step ready' : 'api-setup-step'}>
+          <span className="api-setup-step-number">1</span>
+          <div>
+            <strong>先配 DeepSeek</strong>
+            <p>{deepseekReady ? '已测试通过，可以生成回答。' : '填写 Key，保存后点击“测试连接”。'}</p>
+            <button className="ghost-button compact" type="button" onClick={() => void openExternal('https://platform.deepseek.com/api_keys')}>
+              <ExternalLink size={13} />申请 DeepSeek Key
+            </button>
+          </div>
+          {deepseekReady ? <CheckCircle2 size={17} /> : <CircleAlert size={17} />}
+        </article>
+        <article className={deepgramReady ? 'api-setup-step ready' : 'api-setup-step'}>
+          <span className="api-setup-step-number">2</span>
+          <div>
+            <strong>需要语音时再配 Deepgram</strong>
+            <p>{deepgramReady ? '已测试通过，可以实时转写。' : '只手动输入问题可以跳过，语音面试再配置。'}</p>
+            <button className="ghost-button compact" type="button" onClick={() => void openExternal('https://console.deepgram.com/')}>
+              <ExternalLink size={13} />打开 Deepgram 控制台
+            </button>
+          </div>
+          {deepgramReady ? <CheckCircle2 size={17} /> : <CircleAlert size={17} />}
+        </article>
+        <article className="api-setup-step">
+          <span className="api-setup-step-number">3</span>
+          <div>
+            <strong>保存后再去面试台</strong>
+            <p>Key 只保存在本机。测试通过后，再去简历库和训练页继续。</p>
+          </div>
+          <RadioTower size={17} />
+        </article>
+      </div>
+      {externalMessage && <p className="api-setup-guide-message" role="status">{externalMessage}</p>}
+    </section>
   )
 }
 

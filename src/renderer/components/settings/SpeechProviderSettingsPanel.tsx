@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { ExternalLink, Globe2, KeyRound, Loader2, RadioTower, Save, SlidersHorizontal } from 'lucide-react'
 import { speechProviderHints, speechProviderLinks, speechProviderNames, speechProviderOrder } from '../../../shared/speechProviders'
 import type { SpeechProviderId } from '../../../shared/types'
@@ -14,7 +14,25 @@ export function SpeechProviderSettingsPanel(): JSX.Element {
   const saveSettings = useSettingsStore((state) => state.saveSettings)
   const [savingProvider, setSavingProvider] = useState<SpeechProviderId | null>(null)
   const [saveStatuses, setSaveStatuses] = useState<Partial<Record<SpeechProviderId, string>>>({})
+  const [isFocusedByJump, setIsFocusedByJump] = useState(false)
   const activeProvider = settings.speech.sttProvider
+
+  useEffect(() => {
+    const handleFocus = (event: Event): void => {
+      const focus = (event as CustomEvent<{ focus?: string }>).detail?.focus
+
+      if (focus !== 'speech') return
+
+      setIsFocusedByJump(true)
+      window.setTimeout(() => {
+        document.querySelector<HTMLElement>('[data-onboarding-target="settings-voice"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 30)
+      window.setTimeout(() => setIsFocusedByJump(false), 1500)
+    }
+
+    window.addEventListener('huomiantong:settings-focus', handleFocus)
+    return () => window.removeEventListener('huomiantong:settings-focus', handleFocus)
+  }, [])
 
   const saveSpeechProviderKey = async (provider: SpeechProviderId): Promise<void> => {
     setSavingProvider(provider)
@@ -30,7 +48,7 @@ export function SpeechProviderSettingsPanel(): JSX.Element {
   }
 
   return (
-    <div className="panel settings-panel speech-provider-settings-panel">
+    <div className={`panel settings-panel speech-provider-settings-panel ${isFocusedByJump ? 'focus-flash' : ''}`} data-onboarding-target="settings-voice">
       <div className="panel-heading">
         <div>
           <span className="eyebrow">Speech To Text</span>
@@ -165,7 +183,6 @@ export function SpeechProviderSettingsPanel(): JSX.Element {
     </div>
   )
 }
-
 function getCredentialPlaceholder(provider: SpeechProviderId): string {
   if (provider === 'deepgram') return 'Deepgram Key，可继续复用原配置'
   if (provider === 'tencent') return 'AppID|SecretId|SecretKey，也支持 JSON / key=value'

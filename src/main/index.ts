@@ -121,7 +121,23 @@ app.whenReady().then(() => {
   ipcMain.handle('floating:hide', hideFloatingWindow)
   ipcMain.handle('floating:toggle-maximize', toggleFloatingMaximize)
   ipcMain.handle('docs:open', (_event, docPath: string) => openDocFile(docPath))
-  ipcMain.handle('external:open', (_event, url: string) => shell.openExternal(url))
+  ipcMain.handle('external:open', async (_event, url: string) => {
+    try {
+      const parsedUrl = new URL(url)
+
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        throw new Error('仅支持打开 http/https 网页')
+      }
+
+      await shell.openExternal(parsedUrl.toString())
+      return { ok: true as const }
+    } catch (error) {
+      return {
+        ok: false as const,
+        message: error instanceof Error ? error.message : '打开外部网页失败'
+      }
+    }
+  })
   ipcMain.handle('app:update-status', getCurrentUpdateStatus)
   ipcMain.handle('app:update-check', checkForUpdatesManually)
   ipcMain.handle('app:update-download', downloadAvailableUpdate)

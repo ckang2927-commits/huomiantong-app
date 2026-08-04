@@ -174,16 +174,19 @@ function scoreIntentSpecificMatch(text: string, query: QueryBundle): number {
   let score = 0
 
   if (query.intentCategory === 'location' || query.intentCategory === 'company' || query.intentCategory === 'time') {
+    const asksFirstCompany = /第一家公司|第一个公司|第一份工作|第一段工作|最早一家公司/.test(query.normalizedQuestion)
+    const asksRecentCompany = /上家公司|上一家公司|最近一家公司|最后一家公司/.test(query.normalizedQuestion)
+
     if (looksLikeWorkExperienceLine(normalizedText)) {
       score += 4.2
     }
 
-    if (/第一家公司|第一个公司|第一份工作|第一段工作|最早一家公司/.test(query.normalizedQuestion) && looksLikeWorkExperienceLine(normalizedText)) {
-      score += 3.6
+    if (asksFirstCompany && looksLikeWorkExperienceLine(normalizedText)) {
+      score += looksLikeEarlyWorkLine(normalizedText) ? 6.2 : 2.2
     }
 
-    if (/上家公司|上一家公司|最近一家公司|最后一家公司/.test(query.normalizedQuestion) && looksLikeRecentWorkLine(normalizedText)) {
-      score += 3.2
+    if (asksRecentCompany && looksLikeWorkExperienceLine(normalizedText)) {
+      score += looksLikeRecentWorkLine(normalizedText) ? 7.4 : -2.4
     }
 
     if (/地址|地点|城市|在哪|哪里|哪儿/.test(query.normalizedQuestion) && /省|市|区|县|郑州|许昌|北京|上海|广州|深圳|杭州|南京|成都|武汉|西安|苏州|义乌|东莞/.test(normalizedText)) {
@@ -195,6 +198,8 @@ function scoreIntentSpecificMatch(text: string, query: QueryBundle): number {
     if (/项目|模型|体系|实验|平台|系统|看板|分析|预测|分层|选品|转化率|roi|roas|acos|rfm|a\/b|ab/.test(normalizedText)) {
       score += 3.4
     }
+
+    score += scoreExactProjectTermMatch(normalizedText, query.normalizedQuestion)
 
     if (/印象最深|最深刻|最核心|代表性/.test(query.normalizedQuestion) && /结果|提升|降低|优化|落地|复盘|模型|实验/.test(normalizedText)) {
       score += 2.4
@@ -211,9 +216,23 @@ function scoreIntentSpecificMatch(text: string, query: QueryBundle): number {
 
   if (query.intentCategory === 'process' && /怎么|流程|方法|步骤|方案|sql|python|模型|特征|指标|口径|实验|验证|归因/.test(normalizedText)) {
     score += 2.8
+    score += scoreExactProjectTermMatch(normalizedText, query.normalizedQuestion)
   }
 
   return score
+}
+
+function scoreExactProjectTermMatch(text: string, question: string): number {
+  const exactTerms = ['rfm', 'ltv', 'roi', 'roas', 'acos', 'a/b', 'ab实验', '漏斗', '转化漏斗', '用户分层', '复购率', 'sql', 'python', '看板']
+  let score = 0
+
+  for (const term of exactTerms) {
+    if (question.includes(term) && text.includes(term)) {
+      score += term.length >= 3 ? 3.2 : 2.2
+    }
+  }
+
+  return Math.min(score, 8)
 }
 
 function buildSignals(text: string): SignalSet {
@@ -367,6 +386,10 @@ function buildIntentAliases(question: string, category: ReturnType<typeof analyz
 
 function looksLikeWorkExperienceLine(text: string): boolean {
   return /公司|科技|集团|有限公司|工作经历|任职|就职/.test(text) && /20\d{2}|19\d{2}|数据分析师|工程师|产品经理|运营|开发/.test(text)
+}
+
+function looksLikeEarlyWorkLine(text: string): boolean {
+  return looksLikeWorkExperienceLine(text) && /200\d|201\d|第一|最早|起始/.test(text)
 }
 
 function looksLikeRecentWorkLine(text: string): boolean {

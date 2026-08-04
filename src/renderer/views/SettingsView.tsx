@@ -1,6 +1,6 @@
 ﻿import { useState, type ChangeEvent, type RefObject } from 'react'
 import { useEffect } from 'react'
-import { Briefcase, Cpu, FileText, GraduationCap, Keyboard, MessageSquare, Mic, Settings2, Shield } from 'lucide-react'
+import { Briefcase, Cpu, FileClock, FileText, GraduationCap, Keyboard, MessageSquare, Mic, Settings2, Shield } from 'lucide-react'
 import { AboutDiagnosticsPanel } from '../components/settings/AboutDiagnosticsPanel'
 import { ApiModelConsole } from '../components/settings/ApiModelConsole'
 import { AudioTroubleshootingPanel } from '../components/settings/AudioTroubleshootingPanel'
@@ -14,9 +14,11 @@ import { PrivacySettingsPanel } from '../components/settings/PrivacySettingsPane
 import { SettingsBackupPanel } from '../components/settings/SettingsBackupPanel'
 import { SpeechProviderSettingsPanel } from '../components/settings/SpeechProviderSettingsPanel'
 import { ShortcutGrid } from '../components/settings/ShortcutGrid'
+import { UpdateLogPanel } from '../components/settings/UpdateLogPanel'
+import { OnboardingProgressPanel } from '../components/settings/OnboardingProgressPanel'
 import type { InterviewMode } from '../../shared/types'
 
-type SettingsSectionId = 'api' | 'answer' | 'voice' | 'floating' | 'keys' | 'privacy' | 'training' | 'background' | 'diag'
+type SettingsSectionId = 'api' | 'answer' | 'voice' | 'floating' | 'keys' | 'privacy' | 'training' | 'background' | 'diag' | 'updates'
 
 const SETTINGS_SECTIONS: Array<{ id: SettingsSectionId; icon: typeof Cpu; label: string; desc: string }> = [
   { id: 'api', icon: Cpu, label: 'API 模型', desc: 'Key、模型、费用预算' },
@@ -27,7 +29,8 @@ const SETTINGS_SECTIONS: Array<{ id: SettingsSectionId; icon: typeof Cpu; label:
   { id: 'privacy', icon: Shield, label: '隐私安全', desc: '备份、脱敏、本地数据' },
   { id: 'training', icon: GraduationCap, label: '模拟训练', desc: '题数、复盘、错题' },
   { id: 'background', icon: Briefcase, label: '背景资料', desc: 'HR、薪资、公司补充包' },
-  { id: 'diag', icon: Settings2, label: '诊断日志', desc: '帮助、FAQ、排障' }
+  { id: 'diag', icon: Settings2, label: '诊断日志', desc: '帮助、FAQ、排障' },
+  { id: 'updates', icon: FileClock, label: '更新日志', desc: '版本历史、检查更新、重启' }
 ]
 
 type SettingsViewProps = {
@@ -177,7 +180,6 @@ export function SettingsView({
           </div>
         )
       case 'diag':
-      default:
         return (
           <div className="settings-content-grid two-columns">
             <div className="settings-content-stack">
@@ -187,12 +189,15 @@ export function SettingsView({
             <FAQPanel />
           </div>
         )
+      case 'updates':
+      default:
+        return <UpdateLogPanel />
     }
   }
 
   return (
     <section className="settings-page">
-      <aside className="settings-section-index" aria-label="设置模块导航">
+      <aside className="settings-section-index" aria-label="设置模块导航" data-onboarding-target="settings-map">
         <div className="settings-section-index-header">
           <span className="eyebrow">Settings Map</span>
           <h3>设置目录</h3>
@@ -228,7 +233,10 @@ export function SettingsView({
             <span>保存后生效</span>
           </div>
         </div>
-        <div className="settings-active-body">{renderActiveSection()}</div>
+        <div className="settings-active-body">
+          <OnboardingProgressPanel />
+          {renderActiveSection()}
+        </div>
       </div>
     </section>
   )

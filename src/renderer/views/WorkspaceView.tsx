@@ -40,7 +40,7 @@ type WorkspaceViewProps = {
   isGenerating: boolean
   streamingText: string
   latencyReport: { firstTokenMs?: number; totalMs?: number } | null
-  onSwitchResume: () => void
+  onSwitchResume: (field?: 'candidateName' | 'targetRole') => void
   onStartAudioTranscription: (source: ListeningMode) => void
   onStopAudioTranscription: () => void
   onToggleTranscriptPause: () => void
@@ -131,25 +131,25 @@ export function WorkspaceView({
 
   return (
     <>
-      <section className="workspace-summary-strip">
+      <section className="workspace-summary-strip" data-onboarding-target="workspace">
         <div className="workspace-summary-copy">
           <span className="eyebrow">面试台</span>
           <h2>实时面试工作台</h2>
           <p>先确认候选人、岗位、依据和预热缓存，再进入临场回答。</p>
         </div>
         <div className="workspace-summary-metrics">
-          <button className="workspace-summary-cell workspace-summary-person" type="button" onClick={onSwitchResume}>
+          <button className="workspace-summary-cell workspace-summary-person" data-onboarding-target="workspace-candidate" type="button" onClick={() => onSwitchResume('candidateName')}>
             <span className="workspace-summary-icon"><UserRound size={16} /></span>
             <span>当前候选人</span>
             <strong>{resumeLabel(resume)}</strong>
             <small>点击切换简历</small>
           </button>
-          <div className="workspace-summary-cell workspace-summary-role">
+          <button className="workspace-summary-cell workspace-summary-role" data-onboarding-target="workspace-role" type="button" onClick={() => onSwitchResume('targetRole')}>
             <span className="workspace-summary-icon"><BriefcaseBusiness size={16} /></span>
             <span>目标岗位</span>
             <strong>{resume.targetRole || '未指定'}</strong>
-            <small>影响回答视角</small>
-          </div>
+            <small>点击编辑岗位</small>
+          </button>
           <div className="workspace-summary-cell workspace-summary-evidence">
             <span className="workspace-summary-icon"><FolderCheck size={16} /></span>
             <div className="workspace-summary-cell-head">
@@ -162,7 +162,7 @@ export function WorkspaceView({
             )}
             {!warmupCachedAt && <small>{hasResume ? '回答会优先引用资料' : '建议先导入简历'}</small>}
           </div>
-          <div className="workspace-summary-cell workspace-summary-actions">
+          <div className="workspace-summary-cell workspace-summary-actions" data-onboarding-target="workspace-warmup">
             <span className="workspace-summary-icon"><Flame size={16} /></span>
             <div className="workspace-summary-cell-head">
               <span>面试预热题目</span>

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { AlertTriangle, CheckCircle2, KeyRound, Loader2, Save, TestTube2 } from 'lucide-react'
 import { UsageMoneyPanel } from '../UsageMoneyPanel'
 import { compactKey, providerModelPresets, providerNames } from '../../lib/appHelpers'
@@ -37,6 +37,24 @@ export function ProviderCard({
 }: ProviderCardProps): JSX.Element {
   const [saveStatus, setSaveStatus] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isFocusedByJump, setIsFocusedByJump] = useState(false)
+
+  useEffect(() => {
+    const handleFocus = (event: Event): void => {
+      const focus = (event as CustomEvent<{ focus?: string }>).detail?.focus
+
+      if (focus !== provider) return
+
+      setIsFocusedByJump(true)
+      window.setTimeout(() => {
+        document.querySelector<HTMLElement>(`[data-settings-provider="${provider}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 30)
+      window.setTimeout(() => setIsFocusedByJump(false), 1500)
+    }
+
+    window.addEventListener('huomiantong:settings-focus', handleFocus)
+    return () => window.removeEventListener('huomiantong:settings-focus', handleFocus)
+  }, [provider])
 
   const saveCurrentProvider = async (): Promise<void> => {
     setIsSaving(true)
@@ -52,7 +70,7 @@ export function ProviderCard({
   }
 
   return (
-    <article className={`panel provider-panel ${config.enabled ? 'enabled' : 'disabled'}`}>
+    <article className={`panel provider-panel ${config.enabled ? 'enabled' : 'disabled'} ${isFocusedByJump ? 'focus-flash' : ''}`} data-settings-provider={provider}>
       <div className="provider-title">
         <div>
           <KeyRound size={18} />
@@ -126,4 +144,3 @@ export function ProviderCard({
     </article>
   )
 }
-

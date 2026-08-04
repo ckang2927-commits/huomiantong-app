@@ -55,7 +55,7 @@ export function EvidenceRiskPanel({
   const unsupportedClaims = completed?.risk?.unsupportedClaims ?? []
 
   return (
-    <aside className="panel strategy-panel compact-strategy-panel">
+    <aside className="panel strategy-panel compact-strategy-panel" data-onboarding-target="workspace-strategy">
       <div className="panel-heading strategy-heading">
         <div>
           <span className="eyebrow">回答策略</span>

@@ -83,7 +83,7 @@ export function AnswerPanel({
   const answerParagraphs = splitAnswerParagraphs(displayAnswerText)
 
   return (
-    <div className="panel answer-panel workspace-answer-panel">
+    <div className="panel answer-panel workspace-answer-panel" data-onboarding-target="workspace-answer">
       <div className="panel-heading answer-panel-heading">
         <div>
           <span className="eyebrow">AI Answer</span>

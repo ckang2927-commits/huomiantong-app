@@ -2,7 +2,7 @@ import { CheckCircle2, Download, FileText, RefreshCw, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { AppUpdateStatus } from '../../shared/types'
 
-const RELEASE_NOTES_VERSION = '0.1.3'
+const RELEASE_NOTES_VERSION = '0.1.4'
 const RELEASE_NOTES_STORAGE_KEY = 'huomiantong:last-release-notes-version'
 
 const initialStatus: AppUpdateStatus = {
@@ -115,8 +115,8 @@ export function UpdateExperience(): JSX.Element | null {
             </div>
             <p className="app-modal-lead">现在只完成了版本检查，更新包不会自动下载。</p>
             <ul className="update-summary-list">
-              <li>修复安装后启动失败的问题。</li>
-              <li>更新下载前会先征求你的同意。</li>
+              <li>新增 21 步漫游式新手引导。</li>
+              <li>面试台候选人、目标岗位和顶部服务状态支持精准跳转。</li>
               <li>本地简历、会话和 API 配置会保留。</li>
             </ul>
             <div className="app-modal-actions">
@@ -164,28 +164,28 @@ export function UpdateExperience(): JSX.Element | null {
                 <X size={18} />
               </button>
             </div>
-            <p className="app-modal-lead">欢迎升级。这次主要修复了安装启动和更新流程，并把更新说明改成了真正面向用户的版本日志。</p>
+            <p className="app-modal-lead">欢迎升级。这次重点补齐新手引导、更新日志、面试台定位和复盘稳定性。</p>
             <div className="release-notes-grid">
               <article>
-                <strong>安装稳定性</strong>
-                <p>修复部分电脑安装后启动时报 onnxruntime 原生模块错误的问题。</p>
+                <strong>新手引导</strong>
+                <p>新增 21 步漫游式教程，面试台 7 个重点区域会逐步高亮说明。</p>
               </article>
               <article>
-                <strong>更新更可控</strong>
-                <p>点击检查更新只检查版本，不会直接下载；确认后才开始下载。</p>
+                <strong>精准跳转</strong>
+                <p>候选人、目标岗位、Deepgram 和 DeepSeek 状态都能跳到对应配置区域。</p>
               </article>
               <article>
-                <strong>下载失败可重试</strong>
-                <p>优化更新下载状态和错误提示，避免下载到 100% 后无提示地重复下载。</p>
+                <strong>更新日志</strong>
+                <p>设置中心新增独立更新日志，检查、下载和重启安装都由用户确认。</p>
               </article>
               <article>
-                <strong>声音与题库继续保留</strong>
-                <p>三套本地面试官声音、500 道数据分析师题库和已有本地数据都随升级保留。</p>
+                <strong>稳定性回归</strong>
+                <p>RAG、回答队列、拟真面试、面试复盘和长录音策略已补齐本地检查。</p>
               </article>
             </div>
             <div className="app-modal-footer">
-              <span>完整日志可以在“设置 → 关于与诊断 → 更新说明”中查看。</span>
-              <button className="ghost-button compact" type="button" onClick={() => void window.huomiantong.openDoc('docs/release-notes-v0.1.3.md')}>
+              <span>完整日志可以在“设置 → 更新日志”中查看。</span>
+              <button className="ghost-button compact" type="button" onClick={() => void window.huomiantong.openDoc('docs/release-notes-v0.1.4.md')}>
                 <FileText size={14} />
                 查看完整日志
               </button>

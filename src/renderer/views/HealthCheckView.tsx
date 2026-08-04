@@ -32,7 +32,7 @@ export function HealthCheckView({ checks, summary, isRunning, onRun, onBackWorks
   const riskCount = checks.filter((item) => item.status === 'fail').length + checks.filter((item) => item.status === 'warn').length
 
   return (
-    <section className="panel full-panel health-panel">
+    <section className="panel full-panel health-panel" data-onboarding-target="checkup">
       <div className="health-hero">
         <div className="health-hero-copy">
           <span className="eyebrow">Preflight Check</span>

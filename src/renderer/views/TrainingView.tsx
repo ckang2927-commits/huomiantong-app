@@ -231,7 +231,7 @@ export function TrainingView({
   }
 
   return (
-    <section className={`training-layout training-phase-${trainingPhase}`}>
+    <section className={`training-layout training-phase-${trainingPhase}`} data-onboarding-target="training">
       <div className="training-main panel">
         <div className="panel-heading training-page-heading">
           <div>

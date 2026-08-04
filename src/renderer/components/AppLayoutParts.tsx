@@ -57,7 +57,7 @@ export function SidebarNav({ activeView, onChangeView, collapsed, onToggleCollap
   ]
 
   return (
-    <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''}`} aria-label="主导航">
+    <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''}`} aria-label="主导航" data-onboarding-target="sidebar">
       <div className="brand-block">
         <AppLogo className="brand-logo" />
         <div className="brand-copy">
@@ -103,7 +103,8 @@ type AppTopbarProps = {
   audioStatus: TopbarStatus
   isRunningHealthCheck: boolean
   modelStatus: TopbarStatus
-  onOpenSettings: () => void
+  onOpenAudioSettings: () => void
+  onOpenModelSettings: () => void
   onRefreshSessions: () => void
   onRunHealthCheck: () => void
   onSaveCurrentSession: () => void
@@ -121,24 +122,25 @@ export function AppTopbar({
   audioStatus,
   isRunningHealthCheck,
   modelStatus,
-  onOpenSettings,
+  onOpenAudioSettings,
+  onOpenModelSettings,
   onRefreshSessions,
   onRunHealthCheck,
   onSaveCurrentSession,
   onOpenFloating
 }: AppTopbarProps): JSX.Element {
   return (
-    <header className="topbar">
+    <header className="topbar" data-onboarding-target="topbar">
       <div>
         <span className="eyebrow">Personal Interview Copilot</span>
         <h2>{viewTitles[activeView]}</h2>
       </div>
       <div className="topbar-actions">
-        <button className={`topbar-chip topbar-chip-${audioStatus.kind}`} title={audioStatus.detail} aria-label={`${audioStatus.detail} 点击进入设置中心。`} type="button" onClick={onOpenSettings}>
+        <button className={`topbar-chip topbar-chip-${audioStatus.kind}`} title={audioStatus.detail} aria-label={`${audioStatus.detail} 点击进入语音转写设置。`} type="button" onClick={onOpenAudioSettings}>
           <span className="topbar-chip-dot" />
           {audioStatus.label}
         </button>
-        <button className={`topbar-chip topbar-chip-${modelStatus.kind}`} title={modelStatus.detail} aria-label={`${modelStatus.detail} 点击进入设置中心。`} type="button" onClick={onOpenSettings}>
+        <button className={`topbar-chip topbar-chip-${modelStatus.kind}`} title={modelStatus.detail} aria-label={`${modelStatus.detail} 点击进入回答模型设置。`} type="button" onClick={onOpenModelSettings}>
           <span className="topbar-chip-dot" />
           {modelStatus.label}
         </button>

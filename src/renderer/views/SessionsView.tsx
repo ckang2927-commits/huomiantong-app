@@ -53,7 +53,7 @@ export function SessionsView({
   const visibleTranscriptCount = filteredSessions.reduce((count, item) => count + item.transcript.length, 0)
 
   return (
-    <section className="panel full-panel sessions-page-shell">
+    <section className="panel full-panel sessions-page-shell" data-onboarding-target="sessions">
       <div className="sessions-hero">
         <div>
           <span className="eyebrow">Session History</span>

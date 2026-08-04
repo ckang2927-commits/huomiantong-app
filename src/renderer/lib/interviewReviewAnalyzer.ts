@@ -75,12 +75,12 @@ export function getInterviewReviewAnswerReviewMode(question: Pick<InterviewRevie
     return 'selfIntro'
   }
 
-  if (isShortFactQuestion(question)) {
-    return 'shortFact'
-  }
-
   if (isHrIntentQuestion(question)) {
     return 'hrIntent'
+  }
+
+  if (isShortFactQuestion(question)) {
+    return 'shortFact'
   }
 
   if (requiresBusinessEvidence(question)) {

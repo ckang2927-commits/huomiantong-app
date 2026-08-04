@@ -6,6 +6,7 @@ import { SpeechExpressionPanel } from '../components/training/SpeechExpressionPa
 import { useSpeechPlayback } from '../hooks/useSpeechPlayback'
 import type { TranscriptionSessionStats } from '../lib/audio/audioTypes'
 import { loadMockInterviewConfig, saveMockInterviewConfig, type MockInterviewConfig } from '../lib/mockInterviewConfigStore'
+import { markOnboardingMilestone } from '../lib/onboardingProgress'
 import { analyzeSpeechExpression } from '../lib/speechExpressionAnalyzer'
 import { isTrainingAnswerCompletionCue } from '../lib/trainingAnswerCompletion'
 import type { AppSettings, SpeechExpressionScore, TrainingQuestionCount, TrainingRound } from '../../shared/types'
@@ -41,6 +42,8 @@ type RealisticInterviewViewProps = {
   onOpenTraining: () => void
   onMockInterviewConfigSaved?: () => void
 }
+
+const REALISTIC_RUN_KEY = 'huomiantong.onboarding-realistic-run.v1'
 
 export function RealisticInterviewView({
   settings,
@@ -132,6 +135,13 @@ export function RealisticInterviewView({
     return () => window.clearTimeout(timeout)
   }, [activeRound, answerSpeechStats?.lastFinalAt, currentSpeechScore, isAnswerTranscribing, isGeneratingTraining, normalizedAnswerText, onFinishAnswer])
 
+  useEffect(() => {
+    if (finalReport.trim() && rounds.length > 0 && window.localStorage.getItem(REALISTIC_RUN_KEY) === 'true') {
+      markOnboardingMilestone('realisticInterview')
+      window.localStorage.removeItem(REALISTIC_RUN_KEY)
+    }
+  }, [finalReport, rounds.length])
+
   function saveMockConfig(): void {
     saveMockInterviewConfig(mockInterviewConfig)
     onMockInterviewConfigSaved?.()
@@ -157,6 +167,7 @@ export function RealisticInterviewView({
 
   async function startRealisticInterview(): Promise<void> {
     saveMockInterviewConfig(mockInterviewConfig)
+    window.localStorage.setItem(REALISTIC_RUN_KEY, 'true')
     await onStartTraining({
       roundCount: mockInterviewConfig.questionCount,
       mockInterviewConfig
@@ -164,7 +175,7 @@ export function RealisticInterviewView({
   }
 
   return (
-    <section className="realistic-interview-layout">
+    <section className="realistic-interview-layout" data-onboarding-target="realistic">
       <div className="realistic-main panel">
         <div className="panel-heading realistic-page-heading">
           <div>

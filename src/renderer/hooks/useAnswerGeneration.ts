@@ -16,6 +16,7 @@ import {
   sessionToMarkdown
 } from '../lib/sessionExport'
 import { rewriteInterviewQuestion } from '../lib/questionRewrite'
+import { createQueuedAnswer, shiftQueuedAnswer } from '../lib/answerQueueMachine'
 import { analyzeQuestionIntent, formatQuestionIntentNotice } from '../../shared/questionIntent'
 import { buildTranscriptContext } from '../../shared/transcriptContext'
 import { useSettingsStore } from '../stores/useSettingsStore'
@@ -93,7 +94,7 @@ export function useAnswerGeneration({
   }
 
   function enqueueAnswer(text: string, transcript: TranscriptLine[]): void {
-    queueRef.current.push({ id: crypto.randomUUID(), question: text, transcript })
+    queueRef.current.push(createQueuedAnswer(text, transcript))
     syncQueueState()
     void syncFloatingWindow({
       question: text,
@@ -106,7 +107,8 @@ export function useAnswerGeneration({
   function finishGenerationAndMaybeContinue(): void {
     setIsGenerating(false)
     isGeneratingRef.current = false
-    const nextQueued = queueRef.current.shift()
+    const { nextQueued, remainingQueue } = shiftQueuedAnswer(queueRef.current)
+    queueRef.current = remainingQueue
     syncQueueState()
 
     if (nextQueued) {

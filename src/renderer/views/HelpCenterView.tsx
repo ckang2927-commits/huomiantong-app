@@ -184,7 +184,7 @@ export function HelpCenterView(): JSX.Element {
   }
 
   return (
-    <section className="help-center-page">
+    <section className="help-center-page" data-onboarding-target="help">
       <div className="help-center-hero">
         <div>
           <span className="eyebrow">Local Knowledge Base</span>

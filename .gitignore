@@ -5,6 +5,7 @@ release
 .codex
 .agents
 .tmp-review-test-*
+_archive_temp_*
 新建文件夹
 .env
 .env.*

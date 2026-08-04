@@ -42,7 +42,7 @@ export function ResumeView({
   const otherResumeCount = settings.resume.otherResumes?.length ?? 0
 
   return (
-    <section className="panel full-panel resume-library-shell">
+    <section className="panel full-panel resume-library-shell" data-onboarding-target="resume">
       <div className="resume-library-hero">
         <div>
           <span className="eyebrow">Resume Knowledge</span>
